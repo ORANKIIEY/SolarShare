@@ -1,0 +1,289 @@
+检测到您已登录华为云国际站账号，为了您更好的体验，建议您访问国际站服务网站 [https://www.huaweicloud.com/intl/zh-cn](https://www.huaweicloud.com/intl/zh-cn)
+不再显示此消息
+- [English](javascript:void(0))
+- [Deutsch](javascript:changeLangNew('de-de'))
+- [Español](javascript:changeLangNew('es-es'))
+- [Français](javascript:changeLangNew('fr-fr'))
+- [Nederlands](javascript:changeLangNew('nl-nl'))
+[English](javascript:void(0))
+[Deutsch](javascript:changeLangNew('de-de'))
+[Español](javascript:changeLangNew('es-es'))
+[Français](javascript:changeLangNew('fr-fr'))
+[Nederlands](javascript:changeLangNew('nl-nl'))
+- [English](https://www.huaweicloud.com/intl/en-us/)
+- [Bahasa Indonesia](https://www.huaweicloud.com/intl/id-id/)
+- [Español](https://www.huaweicloud.com/intl/es-us/)
+- [Português](https://www.huaweicloud.com/intl/pt-br/)
+- [Türkçe](https://www.huaweicloud.com/intl/tr-tr/)
+- [عربي](https://www.huaweicloud.com/intl/ar-mena/)
+- [ไทย](https://www.huaweicloud.com/intl/th-th/)
+- [简体中文](https://www.huaweicloud.com/intl/zh-cn/)
+- [日本語](https://www.huaweicloud.com/intl/ja-jp/)
+[English](https://www.huaweicloud.com/intl/en-us/)
+[Bahasa Indonesia](https://www.huaweicloud.com/intl/id-id/)
+[Español](https://www.huaweicloud.com/intl/es-us/)
+[Português](https://www.huaweicloud.com/intl/pt-br/)
+[Türkçe](https://www.huaweicloud.com/intl/tr-tr/)
+[عربي](https://www.huaweicloud.com/intl/ar-mena/)
+[ไทย](https://www.huaweicloud.com/intl/th-th/)
+[简体中文](https://www.huaweicloud.com/intl/zh-cn/)
+[日本語](https://www.huaweicloud.com/intl/ja-jp/)
+- [简体中文](https://www.huaweicloud.com/)
+[简体中文](https://www.huaweicloud.com/)
+-  [Products](https://www.huaweicloud.com/eu/product/dew.html) 
+-  [Solutions](https://www.huaweicloud.com/eu/product/dew.html) 
+-  [Pricing](https://www.huaweicloud.com/eu/product/dew.html) 
+-  [KooGallery](https://www.huaweicloud.com/eu/product/dew.html) 
+-  [Partners](https://www.huaweicloud.com/eu/product/dew.html) 
+-  [Developers](https://www.huaweicloud.com/eu/product/dew.html) 
+-  [Support](https://www.huaweicloud.com/eu/product/dew.html) 
+-  [About Us](https://www.huaweicloud.com/eu/product/dew.html) 
+[Products](https://www.huaweicloud.com/eu/product/dew.html)
+[Solutions](https://www.huaweicloud.com/eu/product/dew.html)
+[Pricing](https://www.huaweicloud.com/eu/product/dew.html)
+[KooGallery](https://www.huaweicloud.com/eu/product/dew.html)
+[Partners](https://www.huaweicloud.com/eu/product/dew.html)
+[Developers](https://www.huaweicloud.com/eu/product/dew.html)
+[Support](https://www.huaweicloud.com/eu/product/dew.html)
+[About Us](https://www.huaweicloud.com/eu/product/dew.html)
+- [Elastic Cloud Server (ECS)](https://www.huaweicloud.com/eu/product/dew.html)
+- [Cloud Backup and Recovery (CBR)](https://www.huaweicloud.com/eu/product/dew.html)
+- [Host Security Service (HSS)](https://www.huaweicloud.com/eu/product/dew.html)
+- [Cloud Container Engine (CCE)](https://www.huaweicloud.com/eu/product/dew.html)
+[Elastic Cloud Server (ECS)](https://www.huaweicloud.com/eu/product/dew.html)
+[Cloud Backup and Recovery (CBR)](https://www.huaweicloud.com/eu/product/dew.html)
+[Host Security Service (HSS)](https://www.huaweicloud.com/eu/product/dew.html)
+[Cloud Container Engine (CCE)](https://www.huaweicloud.com/eu/product/dew.html)
+[Show more results for “”](https://www.huaweicloud.com/eu/product/dew.html)
+- [Contact Us](https://www.huaweicloud.com/eu/about/contact-us.html)
+- [Documentation](https://support.huaweicloud.com/eu/index.html)
+- [Console](https://console.eu.huaweicloud.com/)
+-     My Account Billing & Costs Service Tickets Unread Messages Console Partner Center   Sign In [Sign Up](https://reg.eu.huaweicloud.com/registerui/eu/register.html?service=)   
+- [My Account](https://account.eu.huaweicloud.com/usercenter/?locale=en-us)
+- [Billing & Costs](https://account.eu.huaweicloud.com/usercenter/?locale=en-us)
+- [Service Tickets](https://console.eu.huaweicloud.com/ticket/?locale=en-us)
+- [Unread Messages](https://console.eu.huaweicloud.com/mc/?locale=en-us)
+- [Console](https://console.eu.huaweicloud.com/?locale=en-us)
+- [Partner Center](https://account.eu.huaweicloud.com/obmgr/?locale=en-us)
+- 
+-  Sign In [Sign Up](https://reg.eu.huaweicloud.com/registerui/eu/register.html?service=) 
+- [Sign In](https://auth.eu.huaweicloud.com/authui/login.html?service=)
+
+- [Sign Up](https://reg.eu.huaweicloud.com/registerui/eu/register.html?service=)
+-         My Account  Billing & Costs  Service Tickets  Unread Messages Console  Partner Center    [Log Out](https://portal.eu.huaweicloud.com/index/logout)   
+-  [My Account](https://account.eu.huaweicloud.com/usercenter/?locale=en-us) 
+- [Billing & Costs](https://account.eu.huaweicloud.com/usercenter/?locale=en-us) 
+- [Service Tickets](https://console.eu.huaweicloud.com/ticket/?locale=en-us) 
+- [Unread Messages](https://console.eu.huaweicloud.com/mc/?locale=en-us)
+- [Console](https://console.eu.huaweicloud.com/?locale=en-us) 
+- [Partner Center](https://account.eu.huaweicloud.com/obmgr/?locale=en-us)
+- 
+-   [Log Out](https://portal.eu.huaweicloud.com/index/logout) 
+[Contact Us](https://www.huaweicloud.com/eu/about/contact-us.html)
+[Documentation](https://support.huaweicloud.com/eu/index.html)
+[Console](https://console.eu.huaweicloud.com/)
+- [My Account](https://account.eu.huaweicloud.com/usercenter/?locale=en-us)
+- [Billing & Costs](https://account.eu.huaweicloud.com/usercenter/?locale=en-us)
+- [Service Tickets](https://console.eu.huaweicloud.com/ticket/?locale=en-us)
+- [Unread Messages](https://console.eu.huaweicloud.com/mc/?locale=en-us)
+- [Console](https://console.eu.huaweicloud.com/?locale=en-us)
+- [Partner Center](https://account.eu.huaweicloud.com/obmgr/?locale=en-us)
+- 
+-  Sign In [Sign Up](https://reg.eu.huaweicloud.com/registerui/eu/register.html?service=) 
+[My Account](https://account.eu.huaweicloud.com/usercenter/?locale=en-us)
+[Billing & Costs](https://account.eu.huaweicloud.com/usercenter/?locale=en-us)
+[Service Tickets](https://console.eu.huaweicloud.com/ticket/?locale=en-us)
+[Unread Messages](https://console.eu.huaweicloud.com/mc/?locale=en-us)
+[Console](https://console.eu.huaweicloud.com/?locale=en-us)
+[Partner Center](https://account.eu.huaweicloud.com/obmgr/?locale=en-us)
+[Sign In](https://auth.eu.huaweicloud.com/authui/login.html?service=)
+[Sign Up](https://reg.eu.huaweicloud.com/registerui/eu/register.html?service=)
+[Sign In](https://auth.eu.huaweicloud.com/authui/login.html?service=)
+[Sign Up](https://reg.eu.huaweicloud.com/registerui/eu/register.html?service=)
+-  [My Account](https://account.eu.huaweicloud.com/usercenter/?locale=en-us) 
+- [Billing & Costs](https://account.eu.huaweicloud.com/usercenter/?locale=en-us) 
+- [Service Tickets](https://console.eu.huaweicloud.com/ticket/?locale=en-us) 
+- [Unread Messages](https://console.eu.huaweicloud.com/mc/?locale=en-us)
+- [Console](https://console.eu.huaweicloud.com/?locale=en-us) 
+- [Partner Center](https://account.eu.huaweicloud.com/obmgr/?locale=en-us)
+- 
+-   [Log Out](https://portal.eu.huaweicloud.com/index/logout) 
+[My Account](https://account.eu.huaweicloud.com/usercenter/?locale=en-us)
+[Billing & Costs](https://account.eu.huaweicloud.com/usercenter/?locale=en-us)
+[Service Tickets](https://console.eu.huaweicloud.com/ticket/?locale=en-us)
+[Unread Messages](https://console.eu.huaweicloud.com/mc/?locale=en-us)
+[Console](https://console.eu.huaweicloud.com/?locale=en-us)
+[Partner Center](https://account.eu.huaweicloud.com/obmgr/?locale=en-us)
+[Log Out](https://portal.eu.huaweicloud.com/index/logout)
+[Cancel](https://www.huaweicloud.com/eu/product/dew.html)
+- [Elastic Cloud Server (ECS)](https://www.huaweicloud.com/eu/product/dew.html)
+- [Cloud Backup and Recovery (CBR)](https://www.huaweicloud.com/eu/product/dew.html)
+- [Host Security Service (HSS)](https://www.huaweicloud.com/eu/product/dew.html)
+- [Cloud Container Engine (CCE)](https://www.huaweicloud.com/eu/product/dew.html)
+[Elastic Cloud Server (ECS)](https://www.huaweicloud.com/eu/product/dew.html)
+[Cloud Backup and Recovery (CBR)](https://www.huaweicloud.com/eu/product/dew.html)
+[Host Security Service (HSS)](https://www.huaweicloud.com/eu/product/dew.html)
+[Cloud Container Engine (CCE)](https://www.huaweicloud.com/eu/product/dew.html)
+[Data Encryption Workshop](https://www.huaweicloud.com/eu/product/dew.html)
+-  [Overview](https://www.huaweicloud.com/eu/product/dew.html) 
+-  [Documentation](https://support.huaweicloud.com/eu/dew/index.html) 
+[Overview](https://www.huaweicloud.com/eu/product/dew.html)
+[Documentation](https://support.huaweicloud.com/eu/dew/index.html)
+[Contact Sales](https://www.huaweicloud.com/eu/contact-sales.html)
+-  [Overview](https://www.huaweicloud.com/eu/product/dew.html) 
+-  [Documentation](https://support.huaweicloud.com/eu/dew/index.html)
+
+[Overview](https://www.huaweicloud.com/eu/product/dew.html)
+[Documentation](https://support.huaweicloud.com/eu/dew/index.html)
+[Data Encryption Workshop  (DEW)   Data Encryption Workshop  (DEW)    Data Encryption Workshop (DEW) is a full-stack data encryption service. It covers Key Management Service (KMS) and Dedicated Hardware Security Module (Dedicated HSM). With DEW, you can develop customized encryption applications, and integrate it with other Huawei Cloud services to meet even the most demanding encryption scenarios. Data Encryption Workshop (DEW) is a full-stack encryption service. It covers Key Management Service (KMS) and Dedicated HSM. You can buy yearly/monthly packages or pay as you go.     Access Console   Price Calculator   Documentation](https://www.huaweicloud.com/eu/product/dew.html)
+
+# Data Encryption Workshop (DEW)
+
+Data Encryption Workshop (DEW) is a full-stack data encryption service. It covers Key Management Service (KMS) and Dedicated Hardware Security Module (Dedicated HSM). With DEW, you can develop customized encryption applications, and integrate it with other Huawei Cloud services to meet even the most demanding encryption scenarios.
+Data Encryption Workshop (DEW) is a full-stack encryption service. It covers Key Management Service (KMS) and Dedicated HSM.
+You can buy yearly/monthly packages or pay as you go.
+[Access Console](https://console.eu.huaweicloud.com/dew/)
+[Price Calculator](https://www.huaweicloud.com/eu/pricing/index.html)
+[Documentation](https://support.huaweicloud.com/eu/dew/index.html)
+
+### Product Advantages
+
+-    Service Integration     DEW provides KMS, integrated with many of the Huawei Cloud extensive services including Object Storage Service (OBS), Elastic Volume Service (EVS), Image Management Service (IMS), and more.   DEW provides KMS, integrated with many of the Huawei Cloud extensive services including Object Storage Service (OBS), Elastic Volume Service (EVS), Image Management Service (IMS), and more.    
+-    Dedicated HSM     DEW provides CSCA certified or FIPS 140-2 validated level-3 HSM protection, guaranteeing high-performance encryption to meet your strict security requirements.   DEW provides CSCA certified or FIPS 140-2 validated level-3 HSM protection, guaranteeing high-performance encryption to meet your strict security requirements.    
+Service Integration
+DEW provides KMS, integrated with many of the Huawei Cloud extensive services including Object Storage Service (OBS), Elastic Volume Service (EVS), Image Management Service (IMS), and more.
+DEW provides KMS, integrated with many of the Huawei Cloud extensive services including Object Storage Service (OBS), Elastic Volume Service (EVS), Image Management Service (IMS), and more.
+Dedicated HSM
+DEW provides CSCA certified or FIPS 140-2 validated level-3 HSM protection, guaranteeing high-performance encryption to meet your strict security requirements.
+DEW provides CSCA certified or FIPS 140-2 validated level-3 HSM protection, guaranteeing high-performance encryption to meet your strict security requirements.
+-    Compliance     With DEW, keys and random numbers are generated by the third-party validated HSMs. It is compliant with local and international laws and regulations.   With DEW, keys and random numbers are generated by the third-party validated HSMs. It is compliant with local and international laws and regulations.    
+Compliance
+With DEW, keys and random numbers are generated by the third-party validated HSMs. It is compliant with local and international laws and regulations.
+With DEW, keys and random numbers are generated by the third-party validated HSMs. It is compliant with local and international laws and regulations.
+
+### Application Scenarios
+
+-  [Key Management Service](https://www.huaweicloud.com/eu/product/dew.html) 
+-  [Dedicated HSM](https://www.huaweicloud.com/eu/product/dew.html) 
+[Key Management Service](https://www.huaweicloud.com/eu/product/dew.html)
+[Dedicated HSM](https://www.huaweicloud.com/eu/product/dew.html)
+Key Management Service
+KMS uses validated HSMs to protect your keys, so you can effortlessly create and manage keys for data encryption. It can be integrated with other Huawei Cloud services such as OBS, EVS, and IMS.
+Advantages
+-  Wide Application Integrates with OBS, EVS, IMS, and more to enable secure and easy data encryption. 
+-  Broad Capabilities Supports full management and lifecycle management of your keys. 
+-  Easy Integration Supports APIs, so you can call APIs to integrate KMS with your applications for data encryption. 
+-  Secure and Reliable Stores CMKs redundantly online, physically backs up root keys in multiple copies offline, and performs regular backups to ensure key persistence. 
+Wide Application
+Integrates with OBS, EVS, IMS, and more to enable secure and easy data encryption.
+Broad Capabilities
+Supports full management and lifecycle management of your keys.
+Easy Integration
+Supports APIs, so you can call APIs to integrate KMS with your applications for data encryption.
+Secure and Reliable
+Stores CMKs redundantly online, physically backs up root keys in multiple copies offline, and performs regular backups to ensure key persistence.
+[OBS](https://www.huaweicloud.com/eu/product/obs.html)
+[EVS](https://www.huaweicloud.com/eu/product/evs.html)
+[IMS](https://www.huaweicloud.com/eu/product/ims.html)
+Dedicated HSM
+For encryption scenarios requiring strict compliance, you can use the FIPS 140-2 validated level-3 HSM to implement dedicated encryption.
+Advantages
+-  Regulatory Compliance HSMs provided by DEW are third-party certified or validated. 
+-  Performance Assurance Provides exclusive resource to ensure concurrent high-speed computing performance under different encryption protocols. 
+-  Superb Compatibility Provides industry-standard and application-integrated APIs, including PKCS #11, JCE, CNG, and more. 
+Regulatory Compliance
+HSMs provided by DEW are third-party certified or validated.
+Performance Assurance
+Provides exclusive resource to ensure concurrent high-speed computing performance under different encryption protocols.
+Superb Compatibility
+Provides industry-standard and application-integrated APIs, including PKCS #11, JCE, CNG, and more.
+[ECS](https://www.huaweicloud.com/eu/product/ecs.html)
+
+### Functions
+
+-    Key Management Service     Uses Hardware Security Modules (HSMs) to protect your keys. It seamlessly interworks with other cloud services to protect service data and can be used to develop encryption applications.   Uses Hardware Security Modules (HSMs) to protect your keys. It seamlessly interworks with other cloud services to protect service data and can be used to develop encryption applications.    
+-    Dedicated HSM     Caters to diverse encryption needs with high security and compliance.   Caters to diverse encryption needs with high security and compliance.    
+Key Management Service
+Uses Hardware Security Modules (HSMs) to protect your keys. It seamlessly interworks with other cloud services to protect service data and can be used to develop encryption applications.
+Uses Hardware Security Modules (HSMs) to protect your keys. It seamlessly interworks with other cloud services to protect service data and can be used to develop encryption applications.
+Dedicated HSM
+Caters to diverse encryption needs with high security and compliance.
+Caters to diverse encryption needs with high security and compliance.
+-  Easy Management Easy Management You can use keys imported from offline or created on the KMS console, where you can enable, disable, or delete them as needed. Default keys are also listed on the console for convenient, centralized management. You can use keys imported from offline or created on the KMS console, where you can enable, disable, or delete them as needed. Default keys are also listed on the console for convenient, centralized management. 
+You can use keys imported from offline or created on the KMS console, where you can enable, disable, or delete them as needed. Default keys are also listed on the console for convenient, centralized management.
+You can use keys imported from offline or created on the KMS console, where you can enable, disable, or delete them as needed. Default keys are also listed on the console for convenient, centralized management.
+-  Comprehensive Encryption Comprehensive Encryption Dedicated HSM supports a range of cryptographic algorithms, including RSA, DSA, and ECDSA. It also provides industry-standard and application-integrated APIs, such as PKCS #11, JCE, CNG, and more. You can use dedicated subracks, power supply, bandwidth, and interfaces, meeting strict security requirements. Dedicated HSM supports a range of cryptographic algorithms, including RSA, DSA, and ECDSA. It also provides industry-standard and application-integrated APIs, such as PKCS #11, JCE, CNG, and more. You can use dedicated subracks, power supply, bandwidth, and interfaces, meeting strict security requirements. 
+Dedicated HSM supports a range of cryptographic algorithms, including RSA, DSA, and ECDSA. It also provides industry-standard and application-integrated APIs, such as PKCS #11, JCE, CNG, and more. You can use dedicated subracks, power supply, bandwidth, and interfaces, meeting strict security requirements.
+Dedicated HSM supports a range of cryptographic algorithms, including RSA, DSA, and ECDSA. It also provides industry-standard and application-integrated APIs, such as PKCS #11, JCE, CNG, and more. You can use dedicated subracks, power supply, bandwidth, and interfaces, meeting strict security requirements.
+
+## Documentation
+
+[Technical Documents   Data Encryption Workshop User Guide](https://support.huaweicloud.com/eu/productdesc-dew/dew_01_0093.html)
+
+### https://www.huaweicloud.com/eu/product/dew.html Technical Documents
+[Technical Documents](https://support.huaweicloud.com/eu/productdesc-dew/dew_01_0093.html)
+Data Encryption Workshop User Guide
+[FAQs   Data Encryption Workshop FAQs](https://support.huaweicloud.com/eu/dew_faq/dew_01_0048.html)
+
+### https://www.huaweicloud.com/eu/product/dew.html FAQs
+[FAQs](https://support.huaweicloud.com/eu/dew_faq/dew_01_0048.html)
+Data Encryption Workshop FAQs
+[API Reference   Data Encryption Workshop API Reference](https://support.huaweicloud.com/eu/api-dew/dew_02_0052.html)
+
+### https://www.huaweicloud.com/eu/product/dew.html API Reference
+[API Reference](https://support.huaweicloud.com/eu/api-dew/dew_02_0052.html)
+Data Encryption Workshop API Reference
+Sign up and start an amazing cloud journey
+[Try Free](https://activity.huaweicloud.com/eu/free_packages/index.html)
+[Contact Sales](https://www.huaweicloud.com/eu/contact-sales.html)
+[After-Sales](https://console.eu.huaweicloud.com/ticket/?region=eu-west-101)
+[Self-Service](https://www.huaweicloud.com/eu/service/help-tools.html)
+- [Cookie Settings](https://www.huaweicloud.com/eu/declaration/sa_cookies.html)
+- [Site Terms](https://www.huaweicloud.com/eu/declaration/sa_st.html)
+- [Privacy Statement](https://www.huaweicloud.com/eu/declaration/sa_prp.html)
+[Cookie Settings](https://www.huaweicloud.com/eu/declaration/sa_cookies.html)
+[Site Terms](https://www.huaweicloud.com/eu/declaration/sa_st.html)
+[Privacy Statement](https://www.huaweicloud.com/eu/declaration/sa_prp.html)
+Explore Huawei Cloud
+[Why Us](https://www.huaweicloud.com/eu/about/index.html)
+[Customer Stories](https://www.huaweicloud.com/eu/cases.html)
+[Trust Center](https://www.huaweicloud.com/eu/securecenter/overview.html)
+[Legal](https://www.huaweicloud.com/eu/declaration/sa_cua.html)
+[Press Releases](https://www.huaweicloud.com/eu/news.html)
+Featured Services
+[Elastic Cloud Server (ECS)](https://www.huaweicloud.com/eu/product/ecs.html)
+[Elastic IP (EIP)](https://www.huaweicloud.com/eu/product/eip.html)
+[RDS for MySQL](https://www.huaweicloud.com/eu/product/mysql.html)
+[Elastic Volume Service (EVS)](https://www.huaweicloud.com/eu/product/evs.html)
+[MapReduce Service (MRS)](https://www.huaweicloud.com/eu/product/mrs.html)
+Service and Support
+[Documentation](https://support.huaweicloud.com/eu/index.html)
+[Self-Service](https://www.huaweicloud.com/eu/service/help-tools.html)
+[Contact Us](https://www.huaweicloud.com/eu/contact-sales.html)
+[Public Notices](https://www.huaweicloud.com/eu/notice.1.html)
+[Support Plans](https://www.huaweicloud.com/eu/service/supportplans.html)
+Account and Payment
+[Charge/Payment](https://account.eu.huaweicloud.com/usercenter/?region=eu-west-101)
+[Invoices](https://account.eu.huaweicloud.com/usercenter/?region=eu-west-101)
+[Billing Center](https://account.eu.huaweicloud.com/usercenter/?region=eu-west-101)
+[My Account](https://account.eu.huaweicloud.com/usercenter/?region=eu-west-101)
+[Payment Method](https://account.eu.huaweicloud.com/usercenter/?region=eu-west-101)
+Quick Links
+[Huawei Corporate](https://www.huawei.com/en/)
+[Huawei Enterprise](https://e.huawei.com/en/)
+[Huawei Consumer Business](https://consumer.huawei.com/en/?utm_source=huaweicloud&utm_medium=footer)
+[Huawei Developers](https://developer.huaweicloud.com/eu/)
+© Sparkoo Technologies Ireland Co. Limited 2026
+Company Name: Sparkoo Technologies Ireland Co. Limited, a private company limited by shares.
+Company address: 2nd Floor, Mespil Court, Mespil Road, Ballsbridge, Dublin 4, D04 E516, Ireland
+Email address: eucloud@huaweicloud.com
+Company registration number: 709764
+Company VAT number: IE3921024FH
+- [Cookie Settings](https://www.huaweicloud.com/eu/product/dew.html)
+- [Cookie Policy](https://www.huaweicloud.com/eu/declaration/sa_cookies.html)
+- [Site Terms](https://www.huaweicloud.com/eu/declaration/sa_st.html)
+- [Privacy Statement](https://www.huaweicloud.com/eu/declaration/sa_prp.html)
+[Cookie Settings](https://www.huaweicloud.com/eu/product/dew.html)
+[Cookie Policy](https://www.huaweicloud.com/eu/declaration/sa_cookies.html)
+[Site Terms](https://www.huaweicloud.com/eu/declaration/sa_st.html)
+[Privacy Statement](https://www.huaweicloud.com/eu/declaration/sa_prp.html)

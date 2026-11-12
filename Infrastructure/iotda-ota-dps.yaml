@@ -1,0 +1,145 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# GridGuard AI — Huawei IoTDA Device Provisioning & OTA Configuration
+#
+# Work Breakdown: IoTDA (Device Access) for MQTT, DPS, and OTA
+#
+# This file documents the IoTDA setup required for the edge device lifecycle:
+#   1. DPS  — Device Provisioning Service: auto-enrol ESP32-S3 on first boot
+#   2. OTA  — Over-The-Air updates: push TinyML model .bin to all poles
+#   3. MQTT — Cellular Gateway authenticates and forwards ESP-NOW alerts
+#
+# ALL configuration is done in the Huawei Cloud Console → IoTDA.
+# No SDK integration is required in the .NET backend for DPS/OTA;
+# IoTDA handles device-side provisioning autonomously via MQTT topics.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── 1. IoTDA Instance ──────────────────────────────────────────────────────────
+iotda:
+  region: ap-southeast-3          # Johannesburg
+  edition: Standard               # Supports DPS, OTA, and ROMA Connect bridge
+  # MQTT endpoint for cellular gateways (TLS mandatory)
+  mqtt_endpoint: "iot-<project-id>.iot-mqtts.ap-southeast-3.myhuaweicloud.com:8883"
+  # HTTP endpoint for backend REST API calls (e.g., triggering OTA tasks)
+  rest_endpoint: "https://iotda.ap-southeast-3.myhuaweicloud.com"
+
+# ── 2. Device Provisioning Service (DPS) ──────────────────────────────────────
+# Work Breakdown: First-boot secure enrolment for each ESP32-S3 pole device.
+#
+# How it works:
+#   1. Each ESP32-S3 ships with a unique X.509 device certificate issued during
+#      manufacturing (burn into flash via esptool).
+#   2. On first power-up, the ESP32 connects to the DPS bootstrap endpoint.
+#   3. DPS validates the cert against the IoTDA CA, creates a device record,
+#      and returns the production MQTT endpoint + device credentials.
+#   4. The ESP32 stores these and connects to the live MQTT broker permanently.
+#
+# Console setup:
+#   IoTDA Console → Provisioning → Enrollment Groups → Create Group
+#     - CA Certificate: upload your GridGuard manufacturing CA
+#     - Device template: gridguard-pole-v1
+#     - Initial shadow: { "sensitivity": 95, "ota_enabled": true }
+dps:
+  bootstrap_endpoint: "iot-<project-id>.iot-bs.ap-southeast-3.myhuaweicloud.com"
+  enrollment_group: "gridguard-poles-za"
+  ca_certificate: "certs/gridguard-manufacturing-ca.pem"   # Your CA cert
+  device_template: "gridguard-pole-v1"
+  initial_device_shadow:
+    sensitivity: 95
+    ota_enabled: true
+    tinyml_model_version: "1.0.0"
+    esp_now_channel: 6
+
+# ── 3. OTA (Over-The-Air) Firmware Updates ────────────────────────────────────
+# Work Breakdown: IoTDA OTA to push new TinyML models to ESP32-S3 poles.
+#
+# TWO types of OTA packages GridGuard needs:
+#   a) Firmware OTA  — full ESP-IDF firmware update (.bin)
+#   b) Model OTA     — only the TinyML .tflite model blob embedded in SPIFFS
+#                      (faster, ~50 KB vs ~1.2 MB for full firmware)
+#
+# Workflow for updating the TinyML theft model after retraining on ModelArts:
+#   1. ModelArts retraining job completes → new MindSpore checkpoint
+#   2. Convert to TFLite Micro: mindspore.export() → tflite quantisation
+#   3. Upload .bin to OBS: obs://gridguard-firmware-za/models/v1.2.0.bin
+#   4. Create OTA upgrade task in IoTDA (via REST API or Console):
+#        POST /v5/iot/{project_id}/ota-upgrades/tasks
+#        {
+#          "task_name": "tinyml-model-v1.2.0",
+#          "targets": { "device_group_ids": ["gridguard-poles-za"] },
+#          "task_policy": { "retry_count": 3, "retry_interval": 5 },
+#          "paras": {
+#            "type": "softwareUpgrade",
+#            "version": "1.2.0",
+#            "file_location": {
+#              "obs_location": {
+#                "region": "ap-southeast-3",
+#                "bucket_name": "gridguard-firmware-za",
+#                "object_key": "models/v1.2.0.bin"
+#              }
+#            }
+#          }
+#        }
+#   5. IoTDA broadcasts the OTA task to all poles via MQTT topic:
+#        $oc/devices/{device_id}/sys/events/down
+#   6. ESP32-S3 downloads from OBS (via IoTDA proxy), verifies SHA256,
+#      writes to SPIFFS partition, reboots into new model.
+#   7. IoTDA tracks upgrade status per device — visible in Console dashboard.
+ota:
+  firmware_obs_bucket: "gridguard-firmware-za"
+  firmware_obs_region: "ap-southeast-3"
+  # MQTT topic patterns (IoTDA standard — do not change)
+  ota_command_topic: "$oc/devices/{device_id}/sys/events/down"
+  ota_report_topic:  "$oc/devices/{device_id}/sys/events/up"
+  # SHA256 verification enforced on device before applying update
+  verify_sha256: true
+  # Rollback: if new model increases false-positive rate >5%, trigger rollback OTA
+  rollback_threshold_fp_rate: 0.05
+
+# ── 4. ESP-NOW to MQTT Cellular Gateway ──────────────────────────────────────
+# Work Breakdown: ESP-NOW mesh → IoTDA (MQTT bridge)
+#
+# The gateway is a single ESP32 with a 4G LTE module (e.g., SIM7600 or A7670).
+# It listens on the ESP-NOW radio channel and forwards alerts as MQTT to IoTDA.
+# Only the gateway needs cellular connectivity — pole ESP32-S3 devices use ESP-NOW.
+#
+# Gateway firmware responsibilities:
+#   1. Receive ESP-NOW packet from pole ESP32-S3:
+#        { pole_id, differential, anomaly_score, edge_verdict, timestamp }
+#   2. Authenticate to IoTDA via X.509 client certificate (DPS-issued).
+#   3. Publish to IoTDA topic:
+#        $oc/devices/{gateway_device_id}/sys/messages/up
+#        Payload: JSON alert with pole_id embedded
+#   4. Subscribe to OTA command topic and relay OTA packages to pole devices
+#      via ESP-NOW (reverse direction).
+gateway:
+  hardware: "ESP32-WROVER + SIM7600G-H 4G LTE"
+  esp_now_channel: 6
+  esp_now_encryption: true        # PMK set during manufacturing
+  iotda_auth: "x509_certificate"  # NOT username/password — certificate only
+  mqtt_qos: 1                     # At-least-once for alert reliability
+  # Topic the gateway publishes pole alerts to
+  alert_topic: "$oc/devices/{gateway_device_id}/sys/messages/up"
+  # Topic the gateway subscribes to for OTA relay
+  ota_relay_topic: "$oc/devices/{gateway_device_id}/sys/events/down"
+
+# ── 5. MQTT Topic Structure (for .NET backend MQTT subscriber) ────────────────
+# TheftService.cs subscribes to these topics via the IoTDA MQTT broker.
+mqtt_topics:
+  # Pole theft alerts (published by gateway on behalf of ESP32-S3)
+  theft_alert: "gridguard/poles/+/alerts"
+  # Device status / heartbeat
+  heartbeat:   "gridguard/poles/+/heartbeat"
+  # OTA status reports from devices
+  ota_status:  "$oc/devices/+/sys/events/up"
+
+# ── 6. Console Setup Checklist ────────────────────────────────────────────────
+# Huawei Cloud Console → IoTDA → ap-southeast-3:
+#   [ ] Create IoTDA Standard instance
+#   [ ] Upload manufacturing CA certificate
+#   [ ] Create device group "gridguard-poles-za"
+#   [ ] Create device group "gridguard-gateways-za"
+#   [ ] Enable DPS for both groups
+#   [ ] Create OBS bucket "gridguard-firmware-za" (private, DEW encrypted)
+#   [ ] Enable IoTDA → ROMA Connect bridge (for event streaming to backend)
+#   [ ] Configure OTA upgrade task template
+#   [ ] Enable device shadow for sensitivity/model version tracking

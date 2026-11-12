@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gridguard-api
+  namespace: gridguard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gridguard-api
+  template:
+    metadata:
+      labels:
+        app: gridguard-api
+    spec:
+      containers:
+      - name: api
+        image: swr.ap-southeast-3.myhuaweicloud.com/gridguard/gridguard-api:v4
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ASPNETCORE_HTTP_PORTS
+          value: "8080"
+        - name: Jwt__Secret
+          value: "CHANGE_ME_jwt_secret_min_32_chars"
+        - name: Jwt__Issuer
+          value: "GridGuardAI"
+        - name: ConnectionStrings__TaurusDB
+          value: "Server=CHANGE_ME_DB_HOST;Port=3306;Database=gridguard;Uid=CHANGE_ME_DB_USER;Pwd=CHANGE_ME_DB_PASSWORD;SslMode=Required;CharSet=utf8mb4;"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gridguard-api-svc
+  namespace: gridguard
+  annotations:
+    kubernetes.io/elb.class: union
+    kubernetes.io/elb.autocreate: '{"type":"public","bandwidth_name":"gridguard-bandwidth","bandwidth_chargemode":"bandwidth","bandwidth_size":5,"bandwidth_sharetype":"PER","eip_type":"5_bgp"}'
+spec:
+  type: LoadBalancer
+  selector:
+    app: gridguard-api
+  ports:
+  - port: 80
+    targetPort: 8080

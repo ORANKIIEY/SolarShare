@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>760d051d-822e-4725-87b4-e953c0e67d84</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>.</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- API / OpenAPI -->
+    <PackageReference Include="DotNetEnv" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.12" />
+
+    <!-- Entity Framework Core + TaurusDB (MySQL-compatible via Pomelo) -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+
+    <!-- MQTT -->
+    <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
+
+    <!-- Real-time Push to Next.js dashboard -->
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
+
+    <!-- Huawei Cloud OBS (Object Storage) -->
+    <PackageReference Include="HuaweiCloud.SDK.Obs" Version="3.0.3" />
+
+    <!-- Docker tooling -->
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+
+    <!-- Authentication & Security (Phase 1) -->
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
+    
+    <!-- .env support -->
+    <PackageReference Include="dotenv.net" Version="3.1.2" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Remove="HashGen\**" />
+    <Compile Remove="ObsTest\**" />
+    <Content Remove="HashGen\**" />
+    <Content Remove="ObsTest\**" />
+    <EmbeddedResource Remove="HashGen\**" />
+    <EmbeddedResource Remove="ObsTest\**" />
+    <None Remove="HashGen\**" />
+    <None Remove="ObsTest\**" />
+  </ItemGroup>
+</Project>
