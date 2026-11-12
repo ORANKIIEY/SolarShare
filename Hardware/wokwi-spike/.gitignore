@@ -1,0 +1,2 @@
+# The device's private key. Never commit it.
+secrets.h
