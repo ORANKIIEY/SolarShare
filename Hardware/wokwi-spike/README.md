@@ -64,9 +64,11 @@ You don't need an account to run it.
 
 1. Open <https://wokwi.com/projects/new/esp32>. A new ESP32 project opens with
    two tabs: `sketch.ino` and `diagram.json`.
-2. **sketch.ino**: click the `sketch.ino` tab, click inside the code, press
-   `Ctrl+A` then `Delete`. Open `Hardware/wokwi-spike/sketch.ino` from this repo
-   in Notepad or VS Code, copy all of it, and paste it into Wokwi.
+2. **sketch.ino**: click the `sketch.ino` tab in Wokwi, click inside the
+   code, press `Ctrl+A` then `Delete`. Open `Hardware/wokwi-spike/sketch.ino`
+   from this repo in Notepad or VS Code (not the Arduino IDE, which moves the
+   file into a new `sketch/` folder). Press `Ctrl+A` and `Ctrl+C` there, without
+   deleting anything, and paste it into Wokwi with `Ctrl+V`.
 3. **diagram.json**: click the `diagram.json` tab and do the same with
    `Hardware/wokwi-spike/diagram.json`.
 4. **libraries.txt**: click the small down-arrow (▾) at the right end of the
@@ -77,8 +79,9 @@ You don't need an account to run it.
    `secrets.h`. Open `Hardware/wokwi-spike/secrets.h` on your laptop and paste
    its contents in. It is one line that starts with
    `#define DEVICE_PRIVATE_KEY_HEX`.
-   (Tip: instead of steps 2–5 you can use ▾ → **Upload file(s)…** and pick the
-   four files from `Hardware/wokwi-spike/`.)
+   Paste the code; don't use **Upload file(s)…** for `sketch.ino` and
+   `diagram.json`. Uploading doesn't replace the files Wokwi already has, so
+   it keeps running its default "Hello, ESP32!" example.
 6. Click the green **▶ Start the simulation** button. The first build takes
    about a minute. The serial monitor opens under the circuit.
 7. In the serial monitor, select everything from
@@ -118,6 +121,24 @@ The script checks that:
 `Blockchain/test/SpikeSignatureCheck.ts` also checks the same signature inside
 a Solidity contract, using OpenZeppelin's `ECDSA.recover`. That is what the
 real MeterOracle will use.
+
+## Result (2026-11-13)
+
+It works. The sketch ran on the simulated ESP32 in Wokwi, and
+`npm run verify-spike` passed every check:
+
+| | |
+| --- | --- |
+| EIP-712 digest | `0xe98ebc9e122489931caf9283c996cffc1db85fbd34dd6eaba9022627c59eace4` (same as viem) |
+| `r` | `0x3f1ca00792141bb3a3fee1fbdd942f3746359462bcfed6a462f13a27336a6407` |
+| `s` | `0x5dac3adec589132d1150a0191e9b27211de9830d9e4da41cd189eff24387a4ad` (low-s) |
+| `v` | `27` (found by the laptop; the device doesn't output it) |
+| Recovered signer | `0xaa69C29dA92fa7d0Ef717705Cd21Dd6e4D641ff3` = the device address |
+
+The same values are in `Blockchain/test/SpikeSignatureCheck.ts`, where a
+Solidity contract recovers the device address with OpenZeppelin's
+`ECDSA.recover`. No HMAC or gateway fallback is needed. (`r` and `s` change on
+every run because signing uses a random nonce; the digest and address don't.)
 
 ## What we learned (input for MeterOracle, issue #7)
 

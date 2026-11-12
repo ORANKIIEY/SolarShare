@@ -4,8 +4,8 @@ import { getAddress, hashTypedData, parseSignature } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { METER_READING_TYPES, SPIKE_DOMAIN } from "../scripts/lib/spike";
 
-// Output of Hardware/wokwi-spike/sketch.ino (same C code, built on a laptop).
-// Replace with the real Wokwi serial output once it has been captured.
+// Real serial output of Hardware/wokwi-spike/sketch.ino running on the
+// simulated ESP32 in Wokwi (captured 2026-11-13).
 const DEVICE_VECTOR = {
   reading: {
     meterId: 1,
@@ -17,8 +17,8 @@ const DEVICE_VECTOR = {
     tamper: false,
   },
   digest: "0xe98ebc9e122489931caf9283c996cffc1db85fbd34dd6eaba9022627c59eace4",
-  r: "0x3e826be4688d0a73b174b51380c5f33f1d9484ae9d4fafb7033cc06574c62dd3",
-  s: "0x39b6ed762fb58bc801fae95a0097c823b3c1fdf837ae06220a3fca927891200e",
+  r: "0x3f1ca00792141bb3a3fee1fbdd942f3746359462bcfed6a462f13a27336a6407",
+  s: "0x5dac3adec589132d1150a0191e9b27211de9830d9e4da41cd189eff24387a4ad",
   deviceAddress: "0xaa69C29dA92fa7d0Ef717705Cd21Dd6e4D641ff3",
 } as const;
 
