@@ -1,5 +1,7 @@
 # SolarShare
 
+[![CI](https://github.com/ORANKIIEY/SolarShare/actions/workflows/ci.yml/badge.svg)](https://github.com/ORANKIIEY/SolarShare/actions/workflows/ci.yml)
+
 **Co-own a community solar mini-grid. Get paid monthly. Guarded by a meter that can't lie.**
 
 Node Engine Hackathon 2026 · Real-World Assets track · Base Sepolia testnet
