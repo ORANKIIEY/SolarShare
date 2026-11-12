@@ -111,7 +111,6 @@ In a one-week hackathon we build the onchain, meter and app layers for real, and
 | Relayer (MQTT → Base Sepolia) | `Blockchain/relayer/` | 🔨 Building |
 | Investor and operator web pages | `Frontend/src/app/solar/` | 🔨 Building |
 | Dashboard and design system | `Frontend/` | ✅ Existing |
-| Backend API, database, analytics service | `Backend/`, `Microservice/`, `Infrastructure/` | ⏸️ Not used in the demo |
 
 ### Deployed contracts (Base Sepolia)
 
@@ -140,11 +139,7 @@ In a one-week hackathon we build the onchain, meter and app layers for real, and
 SolarShare/
 ├── Blockchain/        # Smart contracts, tests, deploy scripts, relayer (in progress)
 ├── Frontend/          # Next.js web app (dashboard + investor pages)
-├── Hardware/          # ESP32 meter firmware and Wokwi circuit
-├── Backend/           # .NET 9 API (not used in the demo)
-├── Microservice/      # Python analytics service (not used in the demo)
-├── Infrastructure/    # Deployment configs
-└── powerpoint/        # Presentation material
+└── Hardware/          # ESP32 meter firmware and Wokwi circuit
 ```
 
 ---
@@ -163,25 +158,6 @@ npm run dev
 Then open http://localhost:3000.
 
 Setup steps for the contracts, the relayer and the Wokwi meter will be added here as each part is finished.
-
-<details>
-<summary>Running the full backend stack (optional)</summary>
-
-The .NET backend, MySQL database, MQTT broker and microservice run with Docker:
-
-```bash
-docker compose up -d --build
-```
-
-| Service | URL |
-| --- | --- |
-| Frontend | http://localhost:3000 |
-| Backend API | http://localhost:5000 |
-| Microservice | http://localhost:8000 |
-| MQTT broker | localhost:1883 |
-
-Deployment files contain `CHANGE_ME` placeholders instead of real secrets. Set your own values before deploying.
-</details>
 
 ---
 
