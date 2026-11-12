@@ -1,430 +1,192 @@
-# GridGuard AI - Municipal Grid Protection System
+# SolarShare
 
-South Africa loses R23 billion annually to electricity theft. Illegal connections cause transformer explosions costing R200k-R500k each. 
+**Co-own a community solar mini-grid. Get paid monthly. Guarded by a meter that can't lie.**
 
-**The Problem**: Current meters can't detect "tap-offs" that bypass the meter entirely, and manual audits in high-theft areas put technicians at physical risk.
+Node Engine Hackathon 2026 · Real-World Assets track · Base Sepolia testnet
 
-**Our Solution**: AI-powered sensors detect missing power, neural networks analyze patterns, and smart relays isolate only illegal connections while keeping paying customers powered.
+> 🚧 **Work in progress.** This repository is being built for the hackathon. The table under [Status](#status) shows what works today and what is still being built. Every mock is labelled.
 
 ---
 
-## Quick Start
+## The problem
 
-### Prerequisites
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Node.js 18+](https://nodejs.org/)
-- [PowerShell/Terminal](https://docs.microsoft.com/en-us/powershell/)
+For neighbours in a South African township who want to co-own a rooftop solar system, getting a fair share of the electricity income is hard. Nobody can easily check how much power was really produced and paid for, and illegal connections quietly drain the income before it reaches the owners.
 
-### 1. Clone & Start
+**We demonstrate stablecoin payouts that only release when a tamper-checked meter has signed for that energy onchain, using shares in a 10 kWp community solar mini-grid.**
+
+## What SolarShare does, in plain English
+
+SolarShare lets ordinary people buy small shares (from about R100) in a community solar mini-grid. The mini-grid sells electricity to nearby homes and spaza shops. Every month, that income is paid to shareholders in a digital dollar (USDC), which they can cash out to mobile money.
+
+The hard part is trust. How do you know the solar system is really working, and that the money isn't being lost to theft? SolarShare answers this with a **SolarShare meter**. It counts every unit of electricity produced and billed, signs each reading with its own secret key, and records it on a public blockchain where anyone can check it. If power is stolen, the meter is tampered with or it goes silent, **payouts pause automatically** and everyone can see why.
+
+---
+
+## How it meets the track requirements
+
+| Track requirement | SolarShare feature | Status |
+| --- | --- | --- |
+| A token for one specific asset on a public testnet | `SolarShareToken`: 3,500 shares in one mini-grid, on Base Sepolia | 🔨 Building |
+| At least one rule enforced onchain | Only approved (KYC'd) wallets can hold shares; freeze and recover; supply can never pass the cap | 🔨 Building |
+| Evidence of backing judges can check | Meter readings signed by the device and verified by the contract; asset documents hashed onchain | 🔨 Building |
+| A path back to cash | Monthly payout in test USDC, then cash-out to mobile money (mocked partner) | 🔨 Building |
+| Our extra: theft protection | If billed energy falls well below produced energy, or the meter is tampered with or goes silent, payouts pause | 🔨 Building |
+
+---
+
+## How it works
+
+```mermaid
+flowchart LR
+    M["SolarShare meter<br/>(ESP32, Wokwi)"] -- "signed reading<br/>(EIP-712)" --> B["MQTT broker"]
+    B --> R["Relayer<br/>(Node + viem)"]
+    R -- "transaction" --> O["MeterOracle<br/>checks signature,<br/>flags theft / tamper / offline"]
+    O --> D["RevenueDistributor<br/>accepts income only up to<br/>what the meter proved"]
+    Op["Mini-grid operator"] -- "monthly income (USDC)" --> D
+    T["SolarShareToken<br/>allowlist · freeze · cap · document hash"] --> D
+    D -- "claim payout" --> I["Investor wallet"]
+    I -- "cash out (mocked)" --> MM["Mobile money"]
+    W["SolarShare web app<br/>(Next.js)"] -. "reads everything onchain" .-> O
+    W -.-> T
+    W -.-> D
+```
+
+1. **The meter measures** the energy produced and the energy billed to customers.
+2. **The meter signs** each reading with its own key, the real time and a counter, so readings can't be faked or replayed.
+3. **The reading is sent** over MQTT to a relayer, which pays the transaction fee but cannot change the reading.
+4. **The contract checks it.** The signature must match our meter, the counter must go up, and the values must be physically possible. It then records the reading and flags theft, tampering or silence.
+5. **Money follows the proof.** The operator can only deposit income up to what the meter proved was sold. Shareholders claim their share, unless the meter is in a red state.
+
+### Rules the contracts enforce
+
+| Rule | When broken |
+| --- | --- |
+| Only approved wallets can hold shares | Transfer reverts |
+| Frozen wallets can't move shares; admin can recover to a new wallet | Transfer reverts; recovery is logged |
+| Total shares can never exceed 3,500 | Mint reverts |
+| Readings must be signed by the registered meter | Reading rejected |
+| Each reading must be newer than the last | Replay rejected |
+| Power can't exceed the system's 10 kW rating | Reading rejected |
+| Billed energy must stay close to produced energy | Status "Theft", payouts paused |
+| No reading for 10 minutes | Status "Offline", payouts paused |
+| Deposited income can't exceed what the meter proved | Deposit reverts |
+
+Every mint, transfer, freeze, reading and payout emits an event that an auditor can replay.
+
+---
+
+## The demo: the judge plays the thief
+
+1. Buy shares on a phone in under 2 minutes, with no wallet pop-ups or crypto jargon.
+2. Open the asset page. The meter is green, readings are arriving, and each one links to Basescan.
+3. The operator deposits the month's income and the investor claims a payout.
+4. **Hand a judge the Wokwi meter and ask them to steal power.** Within seconds, the app turns red, a signed theft record appears on Basescan, and payouts are paused.
+5. Tamper with one number in a reading before it reaches the chain. The contract rejects it.
+6. The judge undoes the theft and payouts resume.
+
+---
+
+## What is real and what is mocked
+
+In a one-week hackathon we build the onchain, meter and app layers for real, and mock the physical, legal and banking layers.
+
+| Part | In this demo | What it needs to be real |
+| --- | --- | --- |
+| The solar mini-grid | **Mocked:** simulated meter in Wokwi, illustrative numbers | A solar installer and mini-grid operator |
+| Legal owner (SPV) | **Mocked:** a sample SPV certificate, hashed onchain | An SPV set up with a law firm; FSCA advice on crypto-asset rules |
+| Identity checks (KYC) | **Mocked:** an operator "approve" button | A KYC provider, e.g. Smile ID |
+| Customers paying for power | **Mocked:** the operator deposits test USDC | A prepaid electricity vendor using SA's STS prepaid token standard |
+| Cash-out to mobile money | **Mocked:** a receipt screen | An on/off-ramp partner, e.g. Kotani Pay or Yellow Card |
+| Meter's secret key | **Mocked:** stored in firmware (testnet only) | A secure element chip in the real meter, e.g. ATECC608 |
+| Token, rules, signatures, payouts | **Real**, on Base Sepolia | — |
+
+---
+
+## Status
+
+| Part | Folder | Status |
+| --- | --- | --- |
+| Smart contracts (token, oracle, distributor) | `Blockchain/` | 🔨 Building |
+| Meter firmware that signs readings | `Hardware/esp32-edge/` | 🔨 Building |
+| Relayer (MQTT → Base Sepolia) | `Blockchain/relayer/` | 🔨 Building |
+| Investor and operator web pages | `Frontend/src/app/solar/` | 🔨 Building |
+| Dashboard and design system | `Frontend/` | ✅ Existing |
+| Backend API, database, analytics service | `Backend/`, `Microservice/`, `Infrastructure/` | ⏸️ Not used in the demo |
+
+### Deployed contracts (Base Sepolia)
+
+| Contract | Address |
+| --- | --- |
+| SolarShareToken | _to be deployed_ |
+| MeterOracle | _to be deployed_ |
+| RevenueDistributor | _to be deployed_ |
+
+---
+
+## Tech stack
+
+| Layer | Technology |
+| --- | --- |
+| Blockchain | Solidity, OpenZeppelin Contracts v5, Hardhat, Base Sepolia, test USDC |
+| Meter | ESP32 (Arduino C++), simulated in Wokwi, MQTT, secp256k1 signing |
+| Relayer | Node.js, TypeScript, viem, MQTT |
+| Web app | Next.js, React, TypeScript, Tailwind CSS, viem |
+
+---
+
+## Repository structure
+
+```
+SolarShare/
+├── Blockchain/        # Smart contracts, tests, deploy scripts, relayer (in progress)
+├── Frontend/          # Next.js web app (dashboard + investor pages)
+├── Hardware/          # ESP32 meter firmware and Wokwi circuit
+├── Backend/           # .NET 9 API (not used in the demo)
+├── Microservice/      # Python analytics service (not used in the demo)
+├── Infrastructure/    # Deployment configs
+└── powerpoint/        # Presentation material
+```
+
+---
+
+## Getting started
+
+Requirements: [Node.js 20+](https://nodejs.org/) and Git.
+
 ```bash
-git clone https://github.com/ShawnTheCreator/gridguardai.git
-cd gridguardai
-
-# Start Backend (.NET 9 + TimescaleDB)
-cd Backend
-docker compose up -d --build
-
-# Start Frontend (Next.js 14)
-cd Frontend
+git clone https://github.com/ORANKIIEY/SolarShare.git
+cd SolarShare/Frontend
 npm install
 npm run dev
 ```
 
-### 2. Access System
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5078
-- **Admin Dashboard**: http://localhost:3000/admin
+Then open http://localhost:3000.
 
----
+Setup steps for the contracts, the relayer and the Wokwi meter will be added here as each part is finished.
 
-## Login Credentials
+<details>
+<summary>Running the full backend stack (optional)</summary>
 
-| Role | Email | Password | Dashboard |
-|-------|--------|----------|------------|
-| **Worker** | `thabo@gridguard.co.za` | `gridguard123` | http://localhost:3000/worker |
-| **Governance** | `patrick@gridguard.co.za` | `governance123` | http://localhost:3000/governance |
-| **Developer** | `shawn@gridguard.co.za` | `dev123` | http://localhost:3000/dev |
-| **Admin** | `admin@gridguard.co.za` | `admin123` | http://localhost:3000/admin |
+The .NET backend, MySQL database, MQTT broker and microservice run with Docker:
 
----
-
-## Architecture
-
-### Technology Stack
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| **Frontend** | Next.js 14, React, TypeScript | Real-time dashboard & UI |
-| **Backend** | .NET 9, EF Core | API orchestration & business logic |
-| **Database** | TimescaleDB, PostgreSQL | Time-series telemetry & analytics |
-| **IoT** | Huawei IoTDA, MQTT | Device communication & control |
-| **AI** | Huawei ModelArts, CNN-LSTM | Theft detection & pattern analysis |
-| **Infrastructure** | Docker, Kubernetes | Container orchestration & deployment |
-
-### System Components
-```
-┌─────────────────────────────────────────────────────────┐
-│                GridGuard AI System              │
-├─────────────────────────────────────────────────────────┤
-│  🌐 Frontend (Next.js)                    │
-│  ├── Worker Dashboard - Field Operations        │
-│  ├── Governance Dashboard - Management          │
-│  ├── Developer Dashboard - Technical Tools     │
-│  └── Admin Dashboard - System Control         │
-├─────────────────────────────────────────────────────────┤
-│  🔧 Backend (.NET 9)                      │
-│  ├── Authentication - JWT & Role Management     │
-│  ├── Telemetry API - Real-time Data           │
-│  ├── Incident Management - Alert System          │
-│  └── Asset Management - Grid Infrastructure   │
-├─────────────────────────────────────────────────────────┤
-│  🗄️ Database (TimescaleDB)                 │
-│  ├── Time-series Telemetry - Sensor Data        │
-│  ├── Asset Registry - Grid Components          │
-│  ├── Incident Logs - Event History            │
-│  └── User Management - Authentication         │
-├─────────────────────────────────────────────────────────┤
-│  🤖 AI Services (ModelArts)                  │
-│  ├── CNN-LSTM - Pattern Recognition           │
-│  ├── Anomaly Detection - Theft Identification    │
-│  ├── Predictive Analytics - Maintenance       │
-│  └── Real-time Validation - Decision Making   │
-└─────────────────────────────────────────────────────────┘
-```
-
----
-
-## Key Features
-
-### Real-Time Monitoring
-- **Live Telemetry**: 5-second updates from grid sensors
-- **Emergency Alerts**: Push notifications for critical events
-- **Interactive Maps**: Location-aware grid visualization
-- **Performance Metrics**: Real-time system analytics
-
-### Geographic Access Control
-- **GPS Location**: Automatic area detection
-- **Regional Filtering**: Workers see only assigned areas
-- **Boundary Enforcement**: Strict geographic access control
-- **Area Assignment**: Johannesburg, Durban, Cape Town coverage
-
-### AI-Powered Detection
-- **Pattern Recognition**: CNN-LSTM neural networks
-- **Anomaly Detection**: Real-time theft identification
-- **Predictive Analytics**: Maintenance forecasting
-- **Confidence Scoring**: AI decision reliability
-
-### Field Operations
-- **Mobile Responsive**: Optimized for tablets/phones
-- **Offline Support**: Full functionality without internet
-- **Work Order Management**: Task assignment and tracking
-- **Emergency Response**: Quick incident handling
-
----
-
-## Data Flow
-
-```mermaid
-graph LR
-    A[IoT Sensors] --> B[MQTT Broker]
-    B --> C[.NET Backend]
-    C --> D[TimescaleDB]
-    C --> E[ModelArts AI]
-    C --> F[Next.js Frontend]
-    
-    F --> G[Worker Dashboard]
-    F --> H[Governance Dashboard]
-    F --> I[Developer Dashboard]
-    F --> J[Admin Dashboard]
-    
-    G --> K[Mobile App]
-    H --> L[API Tools]
-    I --> M[Monitoring System]
-```
-
----
-
-## Configuration
-
-### Environment Setup
 ```bash
-# Frontend/.env.local
-NEXT_PUBLIC_API_URL=http://localhost:5078
-NEXT_PUBLIC_WS_URL=ws://localhost:5078
-
-# Backend/.env
-ConnectionStrings__DefaultConnection=Host=localhost;Database=gridguardai;Username=postgres;Password=password
+docker compose up -d --build
 ```
 
-### Docker Services
-```yaml
-# docker-compose.yml
-services:
-  backend:
-    build: ./Backend
-    ports: ["5078:80"]
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      
-  frontend:
-    build: ./Frontend
-    ports: ["3000:3000"]
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:5078
-      
-  database:
-    image: timescale/timescaledb:latest-pg14
-    ports: ["5432:5432"]
-    environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=gridguardai
-```
+| Service | URL |
+| --- | --- |
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:5000 |
+| Microservice | http://localhost:8000 |
+| MQTT broker | localhost:1883 |
 
----
-
-## Development
-
-### Project Structure
-```
-gridguardai/
-├── Backend/                    # .NET 9 API
-│   ├── Controllers/           # API endpoints
-│   ├── Models/               # Data models
-│   ├── Data/                 # Database context
-│   └── Services/             # Business logic
-├── Frontend/                   # Next.js 14 App
-│   ├── src/app/             # Dashboard pages
-│   ├── src/components/       # UI components
-│   ├── src/hooks/           # Custom hooks
-│   └── src/lib/             # Utilities
-├── Infrastructure/              # Deployment configs
-├── Hardware/                   # IoT specs
-└── Microservice/              # Additional services
-```
-
-### Key Components
-- **RealTimeTelemetry**: Live data visualization
-- **EmergencyAlerts**: Push notification system
-- **LocationAwareMap**: Geographic filtering
-- **OfflineModeIndicator**: Connection management
-- **useWebSocket**: Real-time streaming
-- **useGeolocation**: GPS area assignment
-
----
-
-## Emergency Response
-
-### Alert Types
-- **Theft Detection**: Illegal connection identified
-- **Overload Protection**: Excess power draw
-- **Outage Detection**: Power loss events
-- **Maintenance Required**: Predictive service alerts
-
-### Response Workflow
-1. **Detection** → AI identifies unusual pattern
-2. **Alert** → Notification sent to field workers
-3. **Assignment** → Work order created automatically
-4. **Response** → Worker acknowledges and investigates
-5. **Resolution** → Incident logged and closed
-
----
-
-## Analytics & Reporting
-
-### Real-Time Metrics
-- **Grid Load**: Total power consumption
-- **Asset Health**: Infrastructure status
-- **Theft Detection**: AI confidence scores
-- **Response Times**: Field operation efficiency
-
-### Historical Analysis
-- **Trend Patterns**: Long-term consumption analysis
-- **Hotspot Mapping**: High-theft area identification
-- **Performance Reports**: System efficiency metrics
-- **Incident Analytics**: Response time tracking
+Deployment files contain `CHANGE_ME` placeholders instead of real secrets. Set your own values before deploying.
+</details>
 
 ---
 
 ## Security
 
-### Authentication
-- **JWT Tokens**: Secure session management
-- **Role-Based Access**: Permission levels
-- **API Protection**: Bearer token validation
-- **Session Timeout**: Automatic logout
-
-### Data Protection
-- **TLS/SSL**: Encrypted communications
-- **Input Validation**: SQL injection prevention
-- **Rate Limiting**: API abuse protection
-- **Audit Logging**: Complete access tracking
-
----
-
-## Mobile & Offline
-
-### Offline Capabilities
-- **Local Storage**: Caches work orders & telemetry
-- **Auto-Sync**: Data synchronization on reconnect
-- **Manual Sync**: User-triggered updates
-- **Connection Status**: Visual indicators
-
-### Mobile Features
-- **Responsive Design**: Tablet/phone optimized
-- **Touch Interface**: Field operation friendly
-- **GPS Integration**: Location-based services
-- **Push Notifications**: Real-time alerts
-
----
-
-## Deployment
-
-### Production Setup
-```bash
-# Environment variables
-NEXT_PUBLIC_API_URL=https://api.gridguardai.co.za
-NEXT_PUBLIC_WS_URL=wss://api.gridguardai.co.za
-
-# Build and deploy
-npm run build
-npm start
-```
-
-### Monitoring
-- **Health Checks**: `/api/health` endpoint
-- **Performance Metrics**: Application analytics
-- **Error Tracking**: Comprehensive logging
-- **Alert Integration**: Webhook notifications
-
----
-
-## Documentation
-
-- **Technical Docs**: `/Frontend/docs/TECHNICAL_DOCUMENTATION.md`
-- **API Reference**: `/Backend/docs/api-endpoints.md`
-- **Deployment Guide**: `/Infrastructure/deployment.md`
-- **Troubleshooting**: `/docs/troubleshooting.md`
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## Support
-
-- **Documentation**: See `/docs` directory
-- **Issues**: [GitHub Issues](https://github.com/ShawnTheCreator/gridguardai/issues)
-- **Email**: support@gridguardai.co.za
-
----
-
-**GridGuard AI - Protecting Municipal Infrastructure with Intelligence** 
-
----
-
-## Structure
-```
-gridguardai/
-├── backend/
-├── frontend/
-├── infrastructure/
-├── docker-compose.yml
-└── README.md
-```
-
----
-
-## Setup
-
-**Requirements**: Docker Desktop, Windows Subsystem for Linux 2 (WSL 2) for Windows users
-
-**Start**:
-
-```bash
-git clone https://github.com/ShawnTheCreator/gridguardai.git
-cd gridguardai
-docker compose up -d --build
-```
-
-**Stop**:
-
-```bash
-docker compose down
-```
-
-**View logs**:
-
-```bash
-docker compose logs -f
-```
-
-Wait 15 seconds for database initialization.
-
-**Test Endpoints**:
-
-```bash
-curl -X POST http://localhost:5078/api/telemetry \
-  -H "Content-Type: application/json" \
-  -d '{"deviceId": "P-402", "current": 45.5}'
-```
-
-**Test Login**:
-To test the Next.js frontend or the `/api/auth/login` endpoint, use the following seeded admin credentials:
-- **Email:** `thabo@gridguard.co.za`
-- **Password:** `gridguard123`
-
----
-
-## API Endpoints
-
-**Telemetry**:
-- `GET /api/poles` - All poles, Global Positioning System (GPS) coordinates, status
-- `GET /api/poles/{id}/telemetry/live` - Real-time current/voltage
-- `GET /api/poles/{id}/health` - Transformer thermal stress
-- `POST /api/telemetry` - Ingest sensor data
-
-**AI & Forensics**:
-- `POST /api/forensics/analyze` - Send waveform to ModelArts
-- `GET /api/alerts/pending` - Active "Ghost Loads" under review
-
-**Control**:
-- `POST /api/control/isolate` - Disconnect specific port
-- `POST /api/control/limit` - Trigger 10 Ampere (10A) brownout
-- `POST /api/control/restore` - Re-energize line
-
-**Reports**:
-- `GET /api/reports/theft-history` - Audit log
-- `GET /api/reports/savings-estimate` - Return on Investment (ROI) in South African Rand (ZAR)
-
----
-
-## Architecture Flow
-
-```
-Distribution Pole (Edge)
-  ↓ Energy Balance Check
-  ↓ MQTT via Huawei IoTDA
-.NET 9 Backend
-  ↓ Anomaly → ModelArts API
-Huawei ModelArts
-  ↓ Theft confirmed (93-99%)
-  ↓ Command via IoTDA
-Smart Relay
-  ↓ Scalpel disconnect
-Next.js Dashboard
-  ↓ Live update via SignalR
-```
-
----
+- Testnet only. Never use a wallet that holds real money.
+- Private keys live in `.env` files, which are git-ignored. Never commit a key.
+- The meter's signing key is stored in firmware for the demo only. A production meter would keep it in a secure chip.
