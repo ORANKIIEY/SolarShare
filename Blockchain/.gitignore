@@ -1,0 +1,16 @@
+# Secrets: never commit
+.env
+.env.*
+!.env.example
+
+# Hardhat build output
+node_modules/
+artifacts/
+cache/
+typechain-types/
+coverage/
+coverage.json
+ignition/deployments/chain-31337/
+
+# Serial output pasted from Wokwi for verify-spike (safe, but local only)
+spike-output.txt
