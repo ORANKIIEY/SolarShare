@@ -1,0 +1,30 @@
+{
+  "algorithm": "sha256",
+  "note": "SAMPLE documents for the SolarShare hackathon demo, not real legal documents. Each sha256 is recorded onchain in SolarShareToken (getDocuments). Rebuild with `npm run docs:build` in Blockchain/.",
+  "documents": [
+    {
+      "name": "SPV_CERTIFICATE",
+      "file": "spv-company-certificate.pdf",
+      "title": "SPV company certificate",
+      "sha256": "0xcb20f0acb3738a25704cc7c4af042cc370725882d74709d8a0d80bd434a4ea6e",
+      "bytes": 5568,
+      "uri": "https://raw.githubusercontent.com/ORANKIIEY/SolarShare/main/docs/asset-documents/spv-company-certificate.pdf"
+    },
+    {
+      "name": "INSTALLATION_CERTIFICATE",
+      "file": "installation-certificate.pdf",
+      "title": "Installation certificate",
+      "sha256": "0xe213316404dfa5dba8a3eaffd6faf5d7f87870e720f853cca27c9be299875ac8",
+      "bytes": 6076,
+      "uri": "https://raw.githubusercontent.com/ORANKIIEY/SolarShare/main/docs/asset-documents/installation-certificate.pdf"
+    },
+    {
+      "name": "POWER_PURCHASE_AGREEMENT",
+      "file": "power-purchase-agreement.pdf",
+      "title": "Power purchase agreement",
+      "sha256": "0xfb9f4b13181b0110050039019a05d53207468f4f8c6a5b1358db9939f35b5f81",
+      "bytes": 6483,
+      "uri": "https://raw.githubusercontent.com/ORANKIIEY/SolarShare/main/docs/asset-documents/power-purchase-agreement.pdf"
+    }
+  ]
+}
