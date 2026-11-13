@@ -26,13 +26,13 @@ The hard part is trust. How do you know the solar system is really working, and 
 
 ## How it meets the track requirements
 
-| Track requirement | SolarShare feature | Status |
-| --- | --- | --- |
-| A token for one specific asset on a public testnet | `SolarShareToken`: 3,500 shares in one mini-grid, on Base Sepolia | 🔨 Building |
-| At least one rule enforced onchain | Only approved (KYC'd) wallets can hold shares; freeze and recover; supply can never pass the cap | 🔨 Building |
-| Evidence of backing judges can check | Meter readings signed by the device and verified by the contract; asset documents hashed onchain | 🔨 Building |
-| A path back to cash | Monthly payout in test USDC, then cash-out to mobile money (mocked partner) | 🔨 Building |
-| Our extra: theft protection | If billed energy falls well below produced energy, or the meter is tampered with or goes silent, payouts pause | 🔨 Building |
+| Track requirement                                  | SolarShare feature                                                                                             | Status      |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------- |
+| A token for one specific asset on a public testnet | `SolarShareToken`: 3,500 shares in one mini-grid, on Base Sepolia                                              | 🔨 Building |
+| At least one rule enforced onchain                 | Only approved (KYC'd) wallets can hold shares; freeze and recover; supply can never pass the cap               | 🔨 Building |
+| Evidence of backing judges can check               | Meter readings signed by the device and verified by the contract; asset documents hashed onchain               | 🔨 Building |
+| A path back to cash                                | Monthly payout in test USDC, then cash-out to mobile money (mocked partner)                                    | 🔨 Building |
+| Our extra: theft protection                        | If billed energy falls well below produced energy, or the meter is tampered with or goes silent, payouts pause | 🔨 Building |
 
 ---
 
@@ -61,17 +61,17 @@ flowchart LR
 
 ### Rules the contracts enforce
 
-| Rule | When broken |
-| --- | --- |
-| Only approved wallets can hold shares | Transfer reverts |
+| Rule                                                                | When broken                          |
+| ------------------------------------------------------------------- | ------------------------------------ |
+| Only approved wallets can hold shares                               | Transfer reverts                     |
 | Frozen wallets can't move shares; admin can recover to a new wallet | Transfer reverts; recovery is logged |
-| Total shares can never exceed 3,500 | Mint reverts |
-| Readings must be signed by the registered meter | Reading rejected |
-| Each reading must be newer than the last | Replay rejected |
-| Power can't exceed the system's 10 kW rating | Reading rejected |
-| Billed energy must stay close to produced energy | Status "Theft", payouts paused |
-| No reading for 10 minutes | Status "Offline", payouts paused |
-| Deposited income can't exceed what the meter proved | Deposit reverts |
+| Total shares can never exceed 3,500                                 | Mint reverts                         |
+| Readings must be signed by the registered meter                     | Reading rejected                     |
+| Each reading must be newer than the last                            | Replay rejected                      |
+| Power can't exceed the system's 10 kW rating                        | Reading rejected                     |
+| Billed energy must stay close to produced energy                    | Status "Theft", payouts paused       |
+| No reading for 10 minutes                                           | Status "Offline", payouts paused     |
+| Deposited income can't exceed what the meter proved                 | Deposit reverts                      |
 
 Every mint, transfer, freeze, reading and payout emits an event that an auditor can replay.
 
@@ -92,46 +92,46 @@ Every mint, transfer, freeze, reading and payout emits an event that an auditor 
 
 In a one-week hackathon we build the onchain, meter and app layers for real, and mock the physical, legal and banking layers.
 
-| Part | In this demo | What it needs to be real |
-| --- | --- | --- |
-| The solar mini-grid | **Mocked:** simulated meter in Wokwi, illustrative numbers | A solar installer and mini-grid operator |
-| Legal owner (SPV) | **Mocked:** a sample SPV certificate, hashed onchain | An SPV set up with a law firm; FSCA advice on crypto-asset rules |
-| Identity checks (KYC) | **Mocked:** an operator "approve" button | A KYC provider, e.g. Smile ID |
-| Customers paying for power | **Mocked:** the operator deposits test USDC | A prepaid electricity vendor using SA's STS prepaid token standard |
-| Cash-out to mobile money | **Mocked:** a receipt screen | An on/off-ramp partner, e.g. Kotani Pay or Yellow Card |
-| Meter's secret key | **Mocked:** stored in firmware (testnet only) | A secure element chip in the real meter, e.g. ATECC608 |
-| Token, rules, signatures, payouts | **Real**, on Base Sepolia | — |
+| Part                              | In this demo                                               | What it needs to be real                                           |
+| --------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------ |
+| The solar mini-grid               | **Mocked:** simulated meter in Wokwi, illustrative numbers | A solar installer and mini-grid operator                           |
+| Legal owner (SPV)                 | **Mocked:** a sample SPV certificate, hashed onchain       | An SPV set up with a law firm; FSCA advice on crypto-asset rules   |
+| Identity checks (KYC)             | **Mocked:** an operator "approve" button                   | A KYC provider, e.g. Smile ID                                      |
+| Customers paying for power        | **Mocked:** the operator deposits test USDC                | A prepaid electricity vendor using SA's STS prepaid token standard |
+| Cash-out to mobile money          | **Mocked:** a receipt screen                               | An on/off-ramp partner, e.g. Kotani Pay or Yellow Card             |
+| Meter's secret key                | **Mocked:** stored in firmware (testnet only)              | A secure element chip in the real meter, e.g. ATECC608             |
+| Token, rules, signatures, payouts | **Real**, on Base Sepolia                                  | —                                                                  |
 
 ---
 
 ## Status
 
-| Part | Folder | Status |
-| --- | --- | --- |
-| Smart contracts (token, oracle, distributor) | `Blockchain/` | 🔨 Building |
-| Meter firmware that signs readings | `Hardware/esp32-edge/` | 🔨 Building |
-| Relayer (MQTT → Base Sepolia) | `Blockchain/relayer/` | 🔨 Building |
-| Investor and operator web pages | `Frontend/src/app/solar/` | 🔨 Building |
-| Dashboard and design system | `Frontend/` | ✅ Existing |
+| Part                                         | Folder                    | Status      |
+| -------------------------------------------- | ------------------------- | ----------- |
+| Smart contracts (token, oracle, distributor) | `Blockchain/`             | 🔨 Building |
+| Meter firmware that signs readings           | `Hardware/esp32-edge/`    | 🔨 Building |
+| Relayer (MQTT → Base Sepolia)                | `Blockchain/relayer/`     | 🔨 Building |
+| Investor and operator web pages              | `Frontend/src/app/solar/` | 🔨 Building |
+| Dashboard and design system                  | `Frontend/`               | ✅ Existing |
 
 ### Deployed contracts (Base Sepolia)
 
-| Contract | Address |
-| --- | --- |
-| SolarShareToken | _to be deployed_ |
-| MeterOracle | _to be deployed_ |
+| Contract           | Address          |
+| ------------------ | ---------------- |
+| SolarShareToken    | _to be deployed_ |
+| MeterOracle        | _to be deployed_ |
 | RevenueDistributor | _to be deployed_ |
 
 ---
 
 ## Tech stack
 
-| Layer | Technology |
-| --- | --- |
+| Layer      | Technology                                                            |
+| ---------- | --------------------------------------------------------------------- |
 | Blockchain | Solidity, OpenZeppelin Contracts v5, Hardhat, Base Sepolia, test USDC |
-| Meter | ESP32 (Arduino C++), simulated in Wokwi, MQTT, secp256k1 signing |
-| Relayer | Node.js, TypeScript, viem, MQTT |
-| Web app | Next.js, React, TypeScript, Tailwind CSS, viem |
+| Meter      | ESP32 (Arduino C++), simulated in Wokwi, MQTT, secp256k1 signing      |
+| Relayer    | Node.js, TypeScript, viem, MQTT                                       |
+| Web app    | Next.js, React, TypeScript, Tailwind CSS, viem                        |
 
 ---
 
