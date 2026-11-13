@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { CONTRACT_ADDRESSES } from "@/lib/chain";
+import LanguageToggle from "@/components/solar/LanguageToggle";
 
 type Step = "phone" | "otp" | "kyc" | "payment" | "success";
 
@@ -212,8 +213,9 @@ function InvestFlowContent() {
           </div>
         </Link>
 
-        {/* Live Stopwatch Indicator for Judges */}
+        {/* Live Stopwatch Indicator for Judges & Language Switcher */}
         <div className="flex items-center gap-2">
+          <LanguageToggle />
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-mono font-bold">
             <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
             <span>Time: {formatTimer(secondsElapsed)}</span>
@@ -354,6 +356,7 @@ function InvestFlowContent() {
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value)}
                   placeholder="123456"
+                  aria-label="6-digit verification code"
                   className="w-full text-center tracking-[0.5em] font-mono font-black text-2xl py-3 bg-gray-50 border border-gray-300 rounded-xl focus:bg-white focus:outline-none focus:border-amber-500 text-gray-900"
                   autoFocus
                 />
@@ -501,7 +504,8 @@ function InvestFlowContent() {
                 <button
                   type="button"
                   onClick={() => setShareCount(Math.max(1, shareCount - 1))}
-                  className="w-12 h-12 rounded-xl border border-gray-300 font-bold text-xl hover:bg-gray-100 flex items-center justify-center text-gray-900"
+                  aria-label="Decrease share count"
+                  className="w-12 h-12 rounded-xl border border-gray-300 font-bold text-xl hover:bg-gray-100 flex items-center justify-center text-gray-900 focus-visible:ring-2 focus-visible:ring-amber-500"
                 >
                   -
                 </button>
@@ -514,7 +518,8 @@ function InvestFlowContent() {
                 <button
                   type="button"
                   onClick={() => setShareCount(shareCount + 1)}
-                  className="w-12 h-12 rounded-xl border border-gray-300 font-bold text-xl hover:bg-gray-100 flex items-center justify-center text-gray-900"
+                  aria-label="Increase share count"
+                  className="w-12 h-12 rounded-xl border border-gray-300 font-bold text-xl hover:bg-gray-100 flex items-center justify-center text-gray-900 focus-visible:ring-2 focus-visible:ring-amber-500"
                 >
                   +
                 </button>

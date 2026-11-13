@@ -37,8 +37,11 @@ import {
 import { MeterStatus, ClaimBlocker, type Address } from "@/lib/chain-types";
 import sampleData from "@/lib/sample-data.json";
 import TheftAlertBanner from "@/components/solar/TheftAlertBanner";
+import LanguageToggle from "@/components/solar/LanguageToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function MySharesPage() {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -208,6 +211,7 @@ export default function MySharesPage() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <LanguageToggle />
           <button
             onClick={loadData}
             disabled={refreshing}
@@ -234,10 +238,10 @@ export default function MySharesPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="text-xs font-mono text-gray-500">
-              Welcome back, <strong>{investorName}</strong> ({investorPhone})
+              {t.welcomeBack}, <strong>{investorName}</strong> ({investorPhone})
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mt-0.5">
-              My Solar Shares
+              {t.myShares}
             </h1>
           </div>
 
@@ -301,7 +305,7 @@ export default function MySharesPage() {
         {/* ── Key Metrics Cards ─────────────────────────────────────── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
-            <div className="text-xs font-semibold text-gray-500">Shares Owned</div>
+            <div className="text-xs font-semibold text-gray-500">{t.sharesOwnedLabel}</div>
             <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900">
               {sharesOwned} <span className="text-sm font-bold text-amber-600">SSBA</span>
             </div>
@@ -311,7 +315,7 @@ export default function MySharesPage() {
           </div>
 
           <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
-            <div className="text-xs font-semibold text-gray-500">Total Payouts Earned</div>
+            <div className="text-xs font-semibold text-gray-500">{t.totalEarnedLabel}</div>
             <div className="mt-1 text-2xl sm:text-3xl font-black text-gray-900">
               R{totalEarnedZar}
             </div>
@@ -321,7 +325,7 @@ export default function MySharesPage() {
           </div>
 
           <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
-            <div className="text-xs font-semibold text-gray-500">Claimable Right Now</div>
+            <div className="text-xs font-semibold text-gray-500">{t.claimableNowLabel}</div>
             <div className="mt-1 text-2xl sm:text-3xl font-black text-emerald-600">
               R{claimableZar}
             </div>
@@ -331,7 +335,7 @@ export default function MySharesPage() {
           </div>
 
           <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
-            <div className="text-xs font-semibold text-gray-500">Next Payout Cycle</div>
+            <div className="text-xs font-semibold text-gray-500">{t.nextPayoutDateLabel}</div>
             <div className="mt-1 text-xl sm:text-2xl font-black text-gray-900">
               30 Nov 2026
             </div>
@@ -349,7 +353,7 @@ export default function MySharesPage() {
             <div className="flex items-center justify-between">
               <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Coins className="w-5 h-5 text-amber-600" />
-                <span>1. Claim Your Monthly Payout</span>
+                <span>1. {t.claimPayoutBtn}</span>
               </h2>
               <span className="text-[10px] font-mono bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
                 RevenueDistributor
@@ -399,7 +403,7 @@ export default function MySharesPage() {
                 </span>
               ) : (
                 <>
-                  <span>Claim R{claimableZar} Payout</span>
+                  <span>{t.claimPayoutBtn} (R{claimableZar})</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -411,7 +415,7 @@ export default function MySharesPage() {
             <div className="flex items-center justify-between">
               <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Smartphone className="w-5 h-5 text-emerald-600" />
-                <span>2. Cash Out to Mobile Money</span>
+                <span>2. {t.cashOutMobileMoneyBtn}</span>
               </h2>
               <span className="text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-300">
                 Instant ZAR
@@ -442,7 +446,7 @@ export default function MySharesPage() {
               className="w-full py-3.5 px-4 rounded-xl font-bold text-sm text-gray-900 bg-amber-400 hover:bg-amber-500 shadow-xs flex items-center justify-center gap-2 transition-all"
             >
               <Smartphone className="w-4 h-4" />
-              <span>Cash Out to Mobile Money</span>
+              <span>{t.cashOutMobileMoneyBtn}</span>
             </button>
           </div>
         </div>
@@ -494,7 +498,7 @@ export default function MySharesPage() {
         <div className="bg-white p-5 sm:p-6 rounded-2xl border border-gray-200 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-bold text-gray-900">
-              Payout &amp; Cash-Out History
+              {t.payoutHistoryTitle}
             </h2>
             <span className="text-xs text-gray-500">Verified by public record book</span>
           </div>

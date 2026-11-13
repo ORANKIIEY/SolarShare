@@ -44,6 +44,8 @@ import { type MeterState, MeterStatus, MAX_SUPPLY } from "@/lib/chain-types";
 import sampleData from "@/lib/sample-data.json";
 import TheftAlertBanner from "@/components/solar/TheftAlertBanner";
 import LiveReadingsFeed from "@/components/solar/LiveReadingsFeed";
+import LanguageToggle from "@/components/solar/LanguageToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Document verification definition
 interface DocumentItem {
@@ -83,6 +85,8 @@ const DOCUMENTS: DocumentItem[] = [
 ];
 
 export default function SolarAssetPage() {
+  const { t } = useLanguage();
+
   // Live onchain state
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -258,19 +262,20 @@ export default function SolarAssetPage() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <LanguageToggle />
           <Link
             href="/solar/debug"
             className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-700 transition-colors"
           >
             <Activity className="w-3.5 h-3.5 text-amber-600" />
-            <span>Onchain Data</span>
+            <span>{t.onchainData}</span>
           </Link>
           <Link
             href="/solar/me"
             className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-900 hover:bg-gray-800 text-white transition-colors"
           >
             <Coins className="w-3.5 h-3.5 text-amber-400" />
-            <span>My Shares</span>
+            <span>{t.myShares}</span>
           </Link>
         </div>
       </header>
@@ -302,8 +307,12 @@ export default function SolarAssetPage() {
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-            Block A Community Solar Mini-Grid
+            {t.blockATitle}
           </h1>
+
+          <p className="text-xs sm:text-sm text-gray-600">
+            {t.blockASubtitle}
+          </p>
 
           <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-gray-600">
             <div className="flex items-center gap-1.5">
@@ -448,7 +457,7 @@ export default function SolarAssetPage() {
         {/* ── Key Financial Numbers Grid ───────────────────────────── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
-            <div className="text-xs font-semibold text-gray-500">Fixed Share Price</div>
+            <div className="text-xs font-semibold text-gray-500">{t.sharePriceLabel}</div>
             <div className="mt-1 text-xl sm:text-2xl font-black text-gray-900">
               R{PRICE_PER_SHARE_ZAR}
             </div>
@@ -458,17 +467,17 @@ export default function SolarAssetPage() {
           </div>
 
           <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
-            <div className="text-xs font-semibold text-gray-500">Shares Sold</div>
+            <div className="text-xs font-semibold text-gray-500">{t.sharesRemainingLabel}</div>
             <div className="mt-1 text-xl sm:text-2xl font-black text-gray-900">
-              {totalSupply.toLocaleString()}
+              {sharesRemaining.toLocaleString()}
             </div>
             <div className="text-[11px] font-mono text-gray-500 mt-0.5">
-              {sharesRemaining.toLocaleString()} remaining of 3,500
+              {totalSupply.toLocaleString()} sold of 3,500
             </div>
           </div>
 
           <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
-            <div className="text-xs font-semibold text-gray-500">Electricity Sold (Monthly)</div>
+            <div className="text-xs font-semibold text-gray-500">{t.electricitySoldLabel}</div>
             <div className="mt-1 text-xl sm:text-2xl font-black text-amber-600">
               8,100 kWh
             </div>
@@ -478,7 +487,7 @@ export default function SolarAssetPage() {
           </div>
 
           <div className="bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-xs">
-            <div className="text-xs font-semibold text-gray-500">Last Payout Distributed</div>
+            <div className="text-xs font-semibold text-gray-500">{t.monthlyPayoutsLabel}</div>
             <div className="mt-1 text-xl sm:text-2xl font-black text-emerald-600">
               R1.42 <span className="text-xs font-normal text-gray-500">/ share</span>
             </div>
@@ -622,10 +631,10 @@ export default function SolarAssetPage() {
               <div className="border-b border-gray-100 pb-3">
                 <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-amber-600" />
-                  <span>Risks in Plain Words</span>
+                  <span>{t.risksTitle}</span>
                 </h2>
                 <p className="text-xs text-gray-600 mt-0.5">
-                  We believe in 100% honesty. Please read these risks before buying shares.
+                  {t.risksSubtitle}
                 </p>
               </div>
 
@@ -633,40 +642,40 @@ export default function SolarAssetPage() {
                 <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-1.5">
                   <div className="font-bold text-gray-900 flex items-center gap-1.5">
                     <Sun className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span>Sunshine &amp; Weather Changes</span>
+                    <span>{t.riskWeatherTitle}</span>
                   </div>
                   <p className="text-gray-600 leading-relaxed text-[11px]">
-                    Less sun means less power made and sold. Payouts go up during sunny summer months and lower in rainy winter seasons. Income is never guaranteed.
+                    {t.riskWeatherDesc}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-1.5">
                   <div className="font-bold text-gray-900 flex items-center gap-1.5">
                     <Shield className="w-4 h-4 text-red-600 shrink-0" />
-                    <span>Theft &amp; Maintenance Costs</span>
+                    <span>{t.riskTheftTitle}</span>
                   </div>
                   <p className="text-gray-600 leading-relaxed text-[11px]">
-                    If a line is tapped or equipment is damaged, the meter pauses payouts immediately. Fixing broken equipment or replacing batteries costs money from system income.
+                    {t.riskTheftDesc}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-1.5">
                   <div className="font-bold text-gray-900 flex items-center gap-1.5">
                     <Building className="w-4 h-4 text-blue-600 shrink-0" />
-                    <span>This is Not a Bank Deposit</span>
+                    <span>{t.riskNotBankTitle}</span>
                   </div>
                   <p className="text-gray-600 leading-relaxed text-[11px]">
-                    You are co-owning physical solar panels, not putting money in a guaranteed savings account. Panels naturally lose a small amount of efficiency over 20–25 years.
+                    {t.riskNotBankDesc}
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-1.5">
                   <div className="font-bold text-gray-900 flex items-center gap-1.5">
                     <Clock className="w-4 h-4 text-purple-600 shrink-0" />
-                    <span>Selling Shares Takes Time</span>
+                    <span>{t.riskSellingTitle}</span>
                   </div>
                   <p className="text-gray-600 leading-relaxed text-[11px]">
-                    Selling shares back isn&apos;t instant yet. You should plan to keep your shares and earn the monthly payout cash-outs as electricity is sold.
+                    {t.riskSellingDesc}
                   </p>
                 </div>
               </div>
@@ -687,23 +696,24 @@ export default function SolarAssetPage() {
 
               <div>
                 <h3 className="text-lg font-black text-gray-900">
-                  Buy Shares in Block A
+                  {t.buySharesTitle}
                 </h3>
                 <p className="text-xs text-gray-600 mt-1">
-                  Start co-owning from just R100. Pay with EFT, debit card, or mobile money.
+                  {t.buySharesDesc}
                 </p>
               </div>
 
               {/* Share Counter */}
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-gray-700">
-                  How many shares do you want?
+                  {t.shareCountLabel}
                 </label>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setShareCount(Math.max(1, shareCount - 1))}
-                    className="w-11 h-11 rounded-xl border border-gray-300 font-bold text-xl hover:bg-gray-100 flex items-center justify-center transition-colors"
+                    aria-label="Decrease share count"
+                    className="w-11 h-11 rounded-xl border border-gray-300 font-bold text-xl hover:bg-gray-100 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-amber-500"
                   >
                     -
                   </button>
@@ -712,13 +722,15 @@ export default function SolarAssetPage() {
                     min="1"
                     max={sharesRemaining}
                     value={shareCount}
+                    aria-label="Number of shares"
                     onChange={(e) => setShareCount(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="flex-1 h-11 text-center font-black text-xl bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:border-amber-500 font-mono text-gray-900"
+                    className="flex-1 h-11 text-center font-black text-xl bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:border-amber-500 font-mono text-gray-900 focus-visible:ring-2 focus-visible:ring-amber-500"
                   />
                   <button
                     type="button"
                     onClick={() => setShareCount(Math.min(sharesRemaining, shareCount + 1))}
-                    className="w-11 h-11 rounded-xl border border-gray-300 font-bold text-xl hover:bg-gray-100 flex items-center justify-center transition-colors"
+                    aria-label="Increase share count"
+                    className="w-11 h-11 rounded-xl border border-gray-300 font-bold text-xl hover:bg-gray-100 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-amber-500"
                   >
                     +
                   </button>
@@ -732,13 +744,13 @@ export default function SolarAssetPage() {
                   <span className="font-bold text-gray-900">R{PRICE_PER_SHARE_ZAR} ($5.00 USDC)</span>
                 </div>
                 <div className="flex justify-between items-center text-sm font-extrabold text-amber-950 pt-1 border-t border-amber-200">
-                  <span>Total Investment:</span>
+                  <span>{t.totalInvestmentLabel}</span>
                   <span className="text-base text-amber-900">
                     R{totalCostZar.toLocaleString()} (${totalCostUsdc} USDC)
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-[11px] text-gray-500">
-                  <span>Your mini-grid ownership:</span>
+                  <span>{t.ownershipPortionLabel}</span>
                   <span className="font-mono">{((shareCount / 3500) * 100).toFixed(2)}%</span>
                 </div>
               </div>
@@ -748,13 +760,13 @@ export default function SolarAssetPage() {
                 href={`/solar/invest?shares=${shareCount}`}
                 className="w-full py-4 px-6 rounded-xl font-extrabold text-base text-white bg-amber-500 hover:bg-amber-600 shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-center"
               >
-                <span>Invest R{totalCostZar.toLocaleString()} Now</span>
+                <span>{t.investNowBtn} (R{totalCostZar.toLocaleString()})</span>
                 <ArrowRight className="w-5 h-5" />
               </Link>
 
               <div className="flex items-center justify-center gap-1.5 text-[11px] text-gray-500">
                 <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                <span>No crypto wallet needed • Setup in under 2 minutes</span>
+                <span>{t.noWalletRequired}</span>
               </div>
             </div>
 
@@ -784,7 +796,7 @@ export default function SolarAssetPage() {
           href={`/solar/invest?shares=${shareCount}`}
           className="py-2.5 px-5 rounded-xl font-bold text-xs text-white bg-amber-500 hover:bg-amber-600 shadow-xs flex items-center gap-1.5 shrink-0"
         >
-          <span>Invest Now</span>
+          <span>{t.investNowBtn}</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
