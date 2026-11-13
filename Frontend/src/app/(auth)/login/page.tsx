@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 // reCAPTCHA removed — replaced by Huawei WAF bot protection (Project_Work_Breakdown: Auth0 → IAM with MFA integration)
 import {
@@ -118,9 +118,11 @@ const HuaweiLogo = () => (
   </svg>
 );
 
-// ── Page ─────────────────────────────────────────────────────────────────────
-export default function LoginPage() {
+// ── Form ─────────────────────────────────────────────────────────────────────
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
   const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -211,26 +213,21 @@ export default function LoginPage() {
         localStorage.setItem("solarshare_user", JSON.stringify(result.user));
         document.cookie = `solarshare_token=${result.token}; path=/; SameSite=Lax`;
         document.cookie = `solarshare_user=${encodeURIComponent(JSON.stringify(result.user))}; path=/; SameSite=Lax`;
+        // If ?next= was requested, redirect there
+        if (nextParam && nextParam.startsWith('/')) {
+          router.push(nextParam);
+          return;
+        }
+
         // Route based on user role
         switch (result.user.role) {
           case "operator":
+          case "admin":
             router.push("/operator");
             break;
           case "investor":
-            router.push("/solar");
-            break;
-          case "worker":
-            router.push("/worker");
-            break;
-          case "governance":
-            router.push("/governance");
-            break;
-          case "dev":
-            router.push("/dev");
-            break;
-          case "admin":
           default:
-            router.push("/operator");
+            router.push("/solar");
             break;
         }
       } else {
@@ -523,6 +520,36 @@ export default function LoginPage() {
                   )}
                 </div>
 
+                {/* Quick Demo Fill Buttons */}
+                <div className="pt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail("operator@solarshare.co.za");
+                      setPassword("operator123");
+                      setCaptchaVerified(true);
+                      setCaptchaError("");
+                      showToast("Filled demo operator credentials", "info");
+                    }}
+                    className="flex-1 py-1.5 px-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-lg text-xs font-semibold transition-colors"
+                  >
+                    Demo Operator
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail("investor@solarshare.co.za");
+                      setPassword("investor123");
+                      setCaptchaVerified(true);
+                      setCaptchaError("");
+                      showToast("Filled demo investor credentials", "info");
+                    }}
+                    className="flex-1 py-1.5 px-2 bg-gray-50 hover:bg-gray-100 text-gray-800 border border-gray-200 rounded-lg text-xs font-semibold transition-colors"
+                  >
+                    Demo Investor
+                  </button>
+                </div>
+
                 <motion.button
                   type="submit"
                   disabled={isLoading}
@@ -571,5 +598,19 @@ export default function LoginPage() {
         </p>
       </div>
     </motion.div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="w-8 h-8 rounded-sm bg-primary animate-spin"></div>
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
