@@ -10,7 +10,7 @@ match the real contracts.
 | `README.md` | This guide: every read, write, event and status, grouped by screen. |
 | `types.ts` | TypeScript types and enums for those values (copy into the app). |
 | `sample-data.json` | Realistic sample values, including a THEFT example. |
-| `abi/` | The contract ABIs (the machine-readable list of functions) for viem/wagmi. Added with the contracts. |
+| `abi/` | The contract ABIs (the machine-readable list of functions) for viem/wagmi, one JSON file per contract. Import them with `import abi from "./abi/ShareSale.json"`. |
 
 After deployment, `Blockchain/deployments/baseSepolia.json` will hold the real
 contract addresses and ABIs (issue #11).
@@ -234,7 +234,7 @@ Errors: `AccountNotApproved(account)`, `AccountFrozen(account)`,
 
 ### MeterOracle
 
-Reads: `status()`, `getMeterState()`, `latestReading()`, `totalProducedWh()`,
+Reads: `status()`, `isOffline()`, `getMeterState()`, `latestReading()`, `totalProducedWh()`,
 `totalSoldWh()`, `theftGapBps()`, `offlineTimeout()`, `maxReadingAge()`,
 `MAX_POWER_W()` (10000), `meterId()`, `deviceSigner()`, `lastSeq()`,
 `readingDigest(reading)` (for the relayer).
