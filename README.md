@@ -22,6 +22,8 @@ SolarShare lets ordinary people buy small shares (from about R100) in a communit
 
 The hard part is trust. How do you know the solar system is really working, and that the money isn't being lost to theft? SolarShare answers this with a **SolarShare meter**. It counts every unit of electricity produced and billed, signs each reading with its own secret key, and records it on a public blockchain where anyone can check it. If power is stolen, the meter is tampered with or it goes silent, **payouts pause automatically** and everyone can see why.
 
+**The money, in one page:** where each month's income goes, what investors earn, what theft costs and how SolarShare earns: [`docs/money-model/`](docs/money-model/README.md).
+
 ---
 
 ## How it meets the track requirements
