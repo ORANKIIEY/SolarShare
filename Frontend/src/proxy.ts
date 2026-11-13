@@ -12,9 +12,15 @@ import type { NextRequest } from 'next/server';
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Check Public Paths
+  // 1. Check Protected Operator Routes (take priority over public /solar paths)
+  const isOperatorRoute =
+    pathname === '/operator' ||
+    pathname.startsWith('/operator/') ||
+    pathname === '/solar/operator' ||
+    pathname.startsWith('/solar/operator/');
+
+  // Check Public Paths
   // Match '/' exactly, and for other public paths use exact match or subpath prefix (p + '/')
-  // This ensures '/loginx' or '/solarfoo' do NOT accidentally match as public.
   const isExactRoot = pathname === '/';
   const publicPrefixes = [
     '/login',
@@ -26,9 +32,12 @@ export function proxy(request: NextRequest) {
     '/compliance',
   ];
 
-  const isPublic = isExactRoot || publicPrefixes.some(
-    prefix => pathname === prefix || pathname.startsWith(prefix + '/')
-  );
+  const isPublic =
+    !isOperatorRoute &&
+    (isExactRoot ||
+      publicPrefixes.some(
+        prefix => pathname === prefix || pathname.startsWith(prefix + '/')
+      ));
 
   if (isPublic) {
     return NextResponse.next();
@@ -56,6 +65,7 @@ export function proxy(request: NextRequest) {
     // - 'admin' / legacy roles supported for maintenance consoles
     const protectedRoutes: Record<string, string[]> = {
       '/operator': ['operator', 'admin'],
+      '/solar/operator': ['operator', 'admin'],
       '/admin': ['operator', 'admin'],
       '/worker': ['worker', 'operator', 'admin'],
       '/governance': ['governance', 'operator', 'admin'],
