@@ -21,7 +21,7 @@ const regulations = [
         icon: Scale,
         title: "Cybercrimes Act 19 of 2020",
         authority: "Republic of South Africa",
-        desc: "GridGuard AI complies fully with data protection and cybercrime provisions. All unauthorized access attempts are logged and reportable.",
+        desc: "SolarShare complies fully with data protection and cybercrime provisions. All unauthorized access attempts are logged and reportable.",
         status: "Compliant",
     },
     {
@@ -66,7 +66,7 @@ export default function CompliancePage() {
                     <div className="w-7 h-7 rounded-md bg-acid flex items-center justify-center">
                         <Zap className="w-4 h-4 text-void" />
                     </div>
-                    <span className="font-bold text-white tracking-tight text-sm">GridGuard <span className="text-acid">AI</span></span>
+                    <span className="font-bold text-white tracking-tight text-sm">Solar<span className="text-amber-500">Share</span></span>
                 </Link>
                 <div className="hidden md:flex items-center gap-8">
                     <Link href="/platform" className="text-xs font-mono text-zinc-500 hover:text-white transition-colors tracking-wider">Platform</Link>
@@ -102,8 +102,8 @@ export default function CompliancePage() {
                             Built on <span className="text-acid">Trust</span>
                         </h1>
                         <p className="text-zinc-400 text-lg leading-relaxed">
-                            GridGuard AI meets the highest standards of regulatory compliance and cybersecurity. 
-                            Protecting infrastructure and personal data is our foundation.
+                            SolarShare meets the highest standards of regulatory compliance and cybersecurity. 
+                            Protecting infrastructure and investor data is our foundation.
                         </p>
                     </motion.div>
                 </div>
@@ -171,7 +171,7 @@ export default function CompliancePage() {
                         <div>
                             <h3 className="font-bold text-white mb-2">Unauthorised Access Warning</h3>
                             <p className="text-sm text-zinc-400 leading-relaxed">
-                                Unauthorised access to GridGuard AI systems is a criminal offence under the Cybercrimes Act 19 of 2020. 
+                                Unauthorised access to SolarShare systems is a criminal offence under the Cybercrimes Act 19 of 2020. 
                                 All sessions are logged, geolocated, and subject to forensic analysis. Violations will be reported 
                                 to the South African Police Service Cybercrime Unit.
                             </p>
@@ -187,10 +187,10 @@ export default function CompliancePage() {
                         <div className="w-5 h-5 rounded bg-acid flex items-center justify-center">
                             <Zap className="w-3 h-3 text-void" />
                         </div>
-                        <span className="text-xs font-mono text-dim">GridGuard AI © 2026</span>
+                        <span className="text-xs font-mono text-dim">SolarShare © 2026</span>
                     </div>
                     <span className="text-[10px] font-mono text-zinc-700 tracking-wider">
-                        BUILT FOR HUAWEI CLOUD HACKATHON 2026
+                        COMMUNITY SOLAR CO-OWNERSHIP PLATFORM
                     </span>
                 </div>
             </footer>

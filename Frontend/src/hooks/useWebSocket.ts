@@ -41,7 +41,7 @@ export function useWebSocket(url: string) {
   // Fetch real telemetry data from backend
   const fetchTelemetryData = async () => {
     try {
-      const token = localStorage.getItem('gridguard_token');
+      const token = localStorage.getItem('solarshare_token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/telemetry/recent`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -75,7 +75,7 @@ export function useWebSocket(url: string) {
   // Fetch real alerts data from backend
   const fetchAlertsData = async () => {
     try {
-      const token = localStorage.getItem('gridguard_token');
+      const token = localStorage.getItem('solarshare_token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/incidents`, {
         headers: {
           'Authorization': `Bearer ${token}`,

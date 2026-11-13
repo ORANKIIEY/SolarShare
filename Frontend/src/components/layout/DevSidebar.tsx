@@ -53,7 +53,7 @@ export function DevSidebar() {
           <span>Shawn The Creator</span>
         </div>
         <div className="text-[9px] font-mono text-gray-500 mt-1">
-          GridGuard AI • Access Level: Root
+          SolarShare • Access Level: Root
         </div>
       </div>
 

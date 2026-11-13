@@ -1,10 +1,7 @@
 "use client";
 
 /**
- * Google OAuth callback removed.
- * Sole SSO provider is now Huawei IAM / AppGallery Connect.
- * (Project_Work_Breakdown: Auth0 → IAM with MFA integration)
- *
+ * Google OAuth callback stub.
  * If a user lands here via an old link, send them to /login.
  */
 import { useEffect } from "react";

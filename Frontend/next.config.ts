@@ -1,10 +1,14 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 // Work Breakdown: Vercel/Netlify \u2192 Huawei Cloud Application Engine (CAE)
 // `output: 'standalone'` creates a self-contained server bundle for Docker/CAE.
 // The Dockerfile in this directory copies `.next/standalone` for the final image.
 const nextConfig: NextConfig = {
   output: "standalone",
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
 
   // Security headers \u2014 complement Huawei WAF OWASP rule set
   // (Work Breakdown: Zero Trust Architecture, WAF rate limiting)

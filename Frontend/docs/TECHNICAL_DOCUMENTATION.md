@@ -55,15 +55,15 @@ Frontend (Next.js) ←→ Backend (.NET 9) ←→ Database (TimescaleDB)
 const login = async (email, password) => {
   const response = await apiLogin(email, password);
   if (response.token) {
-    localStorage.setItem('gridguard_token', response.token);
-    localStorage.setItem('gridguard_user', JSON.stringify(response.user));
+    localStorage.setItem('solarshare_token', response.token);
+    localStorage.setItem('solarshare_user', JSON.stringify(response.user));
     router.push(`/${response.user.role}`);
   }
 };
 
 // Protected API Calls
 const authenticatedFetch = async (url, options) => {
-  const token = localStorage.getItem('gridguard_token');
+  const token = localStorage.getItem('solarshare_token');
   return fetch(url, {
     ...options,
     headers: {
@@ -84,8 +84,8 @@ const authenticatedFetch = async (url, options) => {
 ```typescript
 // src/proxy.ts
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('gridguard_token')?.value;
-  const user = JSON.parse(request.cookies.get('gridguard_user')?.value || '{}');
+  const token = request.cookies.get('solarshare_token')?.value;
+  const user = JSON.parse(request.cookies.get('solarshare_user')?.value || '{}');
   
   // Route protection based on role
   if (pathname.startsWith('/worker') && user.role !== 'worker') {
@@ -541,18 +541,18 @@ useEffect(() => {
 // Token storage with security considerations
 const tokenStorage = {
   set: (token: string) => {
-    localStorage.setItem('gridguard_token', token);
+    localStorage.setItem('solarshare_token', token);
     // Set secure cookie for server-side validation
-    document.cookie = `gridguard_token=${token}; Secure; HttpOnly; SameSite=Strict`;
+    document.cookie = `solarshare_token=${token}; Secure; HttpOnly; SameSite=Strict`;
   },
   
   get: () => {
-    return localStorage.getItem('gridguard_token');
+    return localStorage.getItem('solarshare_token');
   },
   
   clear: () => {
-    localStorage.removeItem('gridguard_token');
-    document.cookie = 'gridguard_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    localStorage.removeItem('solarshare_token');
+    document.cookie = 'solarshare_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
   }
 };
 ```

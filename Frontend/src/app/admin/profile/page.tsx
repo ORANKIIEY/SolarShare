@@ -33,7 +33,7 @@ export default function ProfilePage() {
             } catch { /* fall through to localStorage */ }
             // localStorage fallback
             try {
-                const stored = localStorage.getItem("gridguard_user");
+                const stored = localStorage.getItem("solarshare_user");
                 if (stored) {
                     const user = JSON.parse(stored);
                     if (user.name) {
@@ -57,8 +57,10 @@ export default function ProfilePage() {
     const handleLogout = async () => {
         showToast("Signing out...", "info");
         try { await apiLogout(); } catch { /* ok */ }
-        localStorage.removeItem("gridguard_token");
-        localStorage.removeItem("gridguard_user");
+        localStorage.removeItem("solarshare_token");
+        localStorage.removeItem("solarshare_user");
+        document.cookie = "solarshare_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "solarshare_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         setTimeout(() => router.push('/login'), 1000);
     };
 

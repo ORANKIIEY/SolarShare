@@ -59,7 +59,7 @@ export default function DigitalTwinMap({ isColorMode = false }: { isColorMode?: 
           className="w-full h-full border-0 scale-110"
           allowFullScreen
           loading="lazy"
-          title="GridGuard Digital Twin — OpenStreetMap"
+          title="SolarShare Digital Twin — OpenStreetMap"
         />
       </div>
 
@@ -92,7 +92,7 @@ export default function DigitalTwinMap({ isColorMode = false }: { isColorMode?: 
             </div>
             <div className="space-y-1">
               <div className="text-[8px] text-zinc-500 uppercase font-mono">Sync</div>
-              <div className="text-xs font-mono text-blue-400">Huawei Cloud</div>
+              <div className="text-xs font-mono text-amber-500">SolarShare Cloud</div>
             </div>
           </div>
         </div>
@@ -257,7 +257,7 @@ export default function DigitalTwinMap({ isColorMode = false }: { isColorMode?: 
               />
             </div>
             <div className="text-[8px] font-mono text-zinc-600 uppercase text-center">
-              Connecting to Huawei ModelArts Photogrammetry Pipeline
+              Connecting to SolarShare Telemetry Pipeline
             </div>
           </div>
         </div>

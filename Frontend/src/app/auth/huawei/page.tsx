@@ -30,10 +30,12 @@ function HuaweiInner() {
         return;
       }
       const data = await res.json();
-      localStorage.setItem("gridguard_token", data.token);
-      localStorage.setItem("gridguard_user", JSON.stringify(data.user));
+      localStorage.setItem("solarshare_token", data.token);
+      localStorage.setItem("solarshare_user", JSON.stringify(data.user));
+      document.cookie = `solarshare_token=${data.token}; path=/; SameSite=Lax`;
+      document.cookie = `solarshare_user=${encodeURIComponent(JSON.stringify(data.user))}; path=/; SameSite=Lax`;
       sessionStorage.removeItem("gg_pkce_verifier_huawei");
-      router.replace("/admin");
+      router.replace("/operator");
     };
     run();
   }, [router, sp]);

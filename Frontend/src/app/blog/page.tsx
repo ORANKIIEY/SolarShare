@@ -15,18 +15,18 @@ import {
 const posts = [
     {
         slug: "launch-announcement",
-        title: "GridGuard AI Launches at Huawei Cloud Hackathon 2026",
-        excerpt: "We're thrilled to announce the public unveiling of GridGuard AI, our AI-powered electricity theft detection platform built on Huawei Cloud infrastructure.",
+        title: "SolarShare Launches Community Solar Co-Ownership",
+        excerpt: "We're thrilled to announce the public unveiling of SolarShare, our community solar co-ownership platform powering South African townships.",
         date: "Feb 28, 2026",
         readTime: "3 min read",
         category: "Announcement",
-        author: "GridGuard Team",
+        author: "SolarShare Team",
         featured: true,
     },
     {
         slug: "cnn-xgboost-architecture",
-        title: "How Our CNN-XGBoost Hybrid Achieves 94% Detection Accuracy",
-        excerpt: "A deep dive into the machine learning architecture powering GridGuard AI's anomaly detection engine. Learn about feature engineering and model training.",
+        title: "How Our ESP32 Cryptographic Meter Proves Solar Generation",
+        excerpt: "A deep dive into the hardware and oracle architecture powering SolarShare's tamper-proof energy metering and automatic safety pausing.",
         date: "Feb 25, 2026",
         readTime: "8 min read",
         category: "Technical",
@@ -35,18 +35,18 @@ const posts = [
     },
     {
         slug: "eskom-partnership",
-        title: "Partnering with Municipalities to Fight Load Shedding",
-        excerpt: "Energy theft costs South African municipalities billions annually. Here's how GridGuard AI is helping to recover those losses and stabilize the grid.",
+        title: "Empowering Township Residents with Clean Energy Revenue",
+        excerpt: "Township mini-grids provide reliable power to local homes and spazas while sharing monthly revenue directly with community co-owners.",
         date: "Feb 20, 2026",
         readTime: "5 min read",
         category: "Case Study",
-        author: "Business Team",
+        author: "Community Team",
         featured: false,
     },
     {
         slug: "huawei-modelarts-integration",
-        title: "Scaling ML Inference with Huawei ModelArts",
-        excerpt: "How we leverage Huawei Cloud's ModelArts platform to process thousands of concurrent anomaly detection requests with sub-300ms latency.",
+        title: "Scaling Township Mini-Grids Across Municipalities",
+        excerpt: "How our distributed architecture processes high-frequency smart meter readings to ensure reliable energy distribution and instant settlements.",
         date: "Feb 15, 2026",
         readTime: "6 min read",
         category: "Technical",
@@ -123,7 +123,7 @@ export default function BlogPage() {
                     <div className="w-7 h-7 rounded-md bg-acid flex items-center justify-center">
                         <Zap className="w-4 h-4 text-void" />
                     </div>
-                    <span className="font-bold text-white tracking-tight text-sm">GridGuard <span className="text-acid">AI</span></span>
+                    <span className="font-bold text-white tracking-tight text-sm">Solar<span className="text-amber-500">Share</span></span>
                 </Link>
                 <div className="hidden md:flex items-center gap-8">
                     <Link href="/platform" className="text-xs font-mono text-zinc-500 hover:text-white transition-colors tracking-wider">Platform</Link>
@@ -179,11 +179,11 @@ export default function BlogPage() {
             <section className="py-16 px-6 md:px-12 border-t border-border/50">
                 <div className="max-w-2xl mx-auto text-center">
                     <h2 className="text-2xl font-bold text-white mb-4">Stay Informed</h2>
-                    <p className="text-zinc-500 mb-6">Get the latest GridGuard updates delivered to your inbox.</p>
+                    <p className="text-zinc-500 mb-6">Get the latest SolarShare updates delivered to your inbox.</p>
                     <div className="flex gap-3 max-w-md mx-auto">
                         <input
                             type="email"
-                            placeholder="operator@municipality.gov.za"
+                            placeholder="investor@solarshare.co.za"
                             className="flex-1 px-4 py-3 bg-panel border border-border rounded-lg text-sm text-white font-mono placeholder:text-zinc-600 focus:outline-none focus:border-acid"
                         />
                         <motion.button
@@ -204,10 +204,10 @@ export default function BlogPage() {
                         <div className="w-5 h-5 rounded bg-acid flex items-center justify-center">
                             <Zap className="w-3 h-3 text-void" />
                         </div>
-                        <span className="text-xs font-mono text-dim">GridGuard AI © 2026</span>
+                        <span className="text-xs font-mono text-dim">SolarShare © 2026</span>
                     </div>
                     <span className="text-[10px] font-mono text-zinc-700 tracking-wider">
-                        BUILT FOR HUAWEI CLOUD HACKATHON 2026
+                        COMMUNITY SOLAR CO-OWNERSHIP PLATFORM
                     </span>
                 </div>
             </footer>

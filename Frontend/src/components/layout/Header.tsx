@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { Bell, Search, User, LogOut, Menu, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Bell, Search, User, LogOut, Sun } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MOCK_ASSETS } from "@/lib/data";
@@ -31,8 +31,10 @@ export function Header() {
   }, [searchQuery]);
 
   const handleLogout = () => {
-    localStorage.removeItem("gridguard_token");
-    localStorage.removeItem("gridguard_user");
+    localStorage.removeItem("solarshare_token");
+    localStorage.removeItem("solarshare_user");
+    document.cookie = "solarshare_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = "solarshare_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     showToast("Session Terminated", "info");
     setTimeout(() => router.push("/login"), 1000);
   };
@@ -40,7 +42,6 @@ export function Header() {
   const handleAssetClick = (id: string) => {
     setSearchQuery(""); // Clear search
     showToast(`Navigating to Asset ${id}...`, "info");
-    // In a real app, router.push(`/assets/${id}`);
   };
 
   return (
@@ -49,11 +50,12 @@ export function Header() {
       {/* Brand / Left */}
       <div className="flex items-center gap-4">
         <Link href="/" className="flex items-center gap-3 group cursor-pointer">
-          <div className="w-9 h-9 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center group-hover:border-gray-300 transition-colors">
-            <img src="/Logo.webp" alt="GridGuard" className="w-6 h-6 object-contain" />
+          <div className="w-9 h-9 rounded-lg bg-amber-500 text-white flex items-center justify-center group-hover:bg-amber-600 transition-colors shadow-xs">
+            <Sun className="w-5 h-5" />
           </div>
           <h1 className="font-bold tracking-tight text-black text-sm">
-            GridGuard <span className="text-gray-500 font-normal">AI</span>
+            Solar<span className="text-amber-600 font-semibold">Share</span>{" "}
+            <span className="text-gray-500 font-normal">Console</span>
           </h1>
         </Link>
       </div>
@@ -63,10 +65,10 @@ export function Header() {
         <div className="relative group w-96">
           <input
             type="text"
-            placeholder="Search asset ID (e.g. TR-03)..."
+            placeholder="Search solar asset ID (e.g. TR-03)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-gray-50 border border-gray-200 rounded-lg py-1.5 pl-9 pr-24 text-xs text-gray-700 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 w-full transition-all placeholder:text-gray-400 font-mono"
+            className="bg-gray-50 border border-gray-200 rounded-lg py-1.5 pl-9 pr-24 text-xs text-gray-700 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 w-full transition-all placeholder:text-gray-400 font-mono"
           />
           <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-gray-600 transition-colors" />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
@@ -108,7 +110,7 @@ export function Header() {
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors relative"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full border-2 border-white"></span>
+            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-amber-500 rounded-full border-2 border-white"></span>
           </button>
 
           {isNotifOpen && (
@@ -122,18 +124,18 @@ export function Header() {
                 <div className="max-h-64 overflow-y-auto">
                   <div className="px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer group">
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
-                      <div className="text-xs text-black font-bold group-hover:text-gray-700 transition-colors">TR-03 Critical Thermal</div>
+                      <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></div>
+                      <div className="text-xs text-black font-bold group-hover:text-gray-700 transition-colors">TR-03 Meter Reading</div>
                     </div>
-                    <div className="text-[10px] text-gray-500 font-mono">Core temp exceeded 85°C. Auto-isolation queued.</div>
+                    <div className="text-[10px] text-gray-500 font-mono">ESP32 signed reading received and verified.</div>
                     <div className="text-[9px] text-gray-400 mt-1">2 mins ago</div>
                   </div>
                   <div className="px-4 py-3 hover:bg-gray-50 cursor-pointer group">
                     <div className="flex items-center gap-2 mb-1">
                       <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                      <div className="text-xs text-black font-bold group-hover:text-gray-700 transition-colors">Backup Complete</div>
+                      <div className="text-xs text-black font-bold group-hover:text-gray-700 transition-colors">Payout Ready</div>
                     </div>
-                    <div className="text-[10px] text-gray-500 font-mono">Daily encrypted snapshot synced to cloud.</div>
+                    <div className="text-[10px] text-gray-500 font-mono">Monthly revenue distribution cycle verified.</div>
                     <div className="text-[9px] text-gray-400 mt-1">1 hour ago</div>
                   </div>
                 </div>
@@ -150,7 +152,7 @@ export function Header() {
             onClick={() => { setIsUserMenuOpen(!isUserMenuOpen); setIsNotifOpen(false); }}
             className="flex items-center gap-2 pl-1 cursor-pointer hover:opacity-80 transition-opacity"
           >
-            <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-gray-600 to-gray-500 border border-gray-400 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-600 to-amber-500 border border-amber-400 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
               OP
             </div>
           </button>
@@ -160,8 +162,8 @@ export function Header() {
               <div className="fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)}></div>
               <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 animate-in fade-in zoom-in-95 duration-200">
                 <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-                  <div className="text-xs text-black font-bold">Operator 42</div>
-                  <div className="text-[10px] text-gray-500 font-mono">Session ID: 882X-9</div>
+                  <div className="text-xs text-black font-bold">SolarShare Operator</div>
+                  <div className="text-[10px] text-gray-500 font-mono">Role: Operator</div>
                 </div>
                 <Link
                   href="/admin/profile"

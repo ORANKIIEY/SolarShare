@@ -39,8 +39,8 @@ const platformFeatures = [
     },
     {
         icon: Database,
-        title: "TaurusDB Telemetry Store",
-        desc: "High-frequency sensor data stored in Huawei TaurusDB. Query 5 years of grid history in milliseconds.",
+        title: "Telemetry & State Store",
+        desc: "High-frequency smart meter readings verified and indexed for instant historical analytics and audits.",
         stats: [
             { label: "Data Points/Day", value: "50M+" },
             { label: "Query Latency", value: "<10ms" },
@@ -58,10 +58,10 @@ const platformFeatures = [
 ];
 
 const integrations = [
-    { name: "Huawei Cloud", desc: "ModelArts, TaurusDB, OBS" },
-    { name: "SCADA Systems", desc: "IEC 61850 Protocol Support" },
-    { name: "Smart Meters", desc: "AMI/AMR Integration" },
-    { name: "GIS Mapping", desc: "Esri & OpenStreetMap" },
+    { name: "Base Sepolia", desc: "Decentralized Settlement & Token Registry" },
+    { name: "ESP32 Hardware Oracle", desc: "Cryptographic ECDSA signed readings" },
+    { name: "Smart Prepaid Meters", desc: "AMI/AMR Township Integration" },
+    { name: "GIS Mapping", desc: "Satellite Roof & Grid Telemetry" },
 ];
 
 function FeatureCard({ feature, index }: { feature: typeof platformFeatures[0]; index: number }) {
@@ -112,10 +112,10 @@ export default function PlatformPage() {
             {/* Nav */}
             <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 py-4 border-b border-border/50 backdrop-blur-xl bg-void/70">
                 <Link href="/" className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-md bg-acid flex items-center justify-center">
-                        <Zap className="w-4 h-4 text-void" />
+                    <div className="w-7 h-7 rounded-md bg-amber-500 flex items-center justify-center">
+                        <Zap className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-white tracking-tight text-sm">GridGuard <span className="text-acid">AI</span></span>
+                    <span className="font-bold text-white tracking-tight text-sm">Solar<span className="text-amber-500">Share</span></span>
                 </Link>
                 <div className="hidden md:flex items-center gap-8">
                     <Link href="/platform" className="text-xs font-mono text-acid tracking-wider">Platform</Link>
@@ -190,16 +190,16 @@ export default function PlatformPage() {
             {/* CTA */}
             <section className="py-20 px-6 md:px-12">
                 <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-4xl font-bold text-white mb-4">Ready to deploy?</h2>
-                    <p className="text-zinc-500 mb-8">Get a personalized demo of the GridGuard AI platform.</p>
-                    <Link href="/signup">
+                    <h2 className="text-4xl font-bold text-white mb-4">Ready to co-own solar?</h2>
+                    <p className="text-zinc-500 mb-8">Explore community solar projects and start earning monthly returns.</p>
+                    <Link href="/solar">
                         <motion.button
-                            whileHover={{ scale: 1.04, boxShadow: "0 0 40px rgba(204,255,0,0.35)" }}
+                            whileHover={{ scale: 1.04, boxShadow: "0 0 40px rgba(245,158,11,0.35)" }}
                             whileTap={{ scale: 0.96 }}
-                            className="inline-flex items-center gap-3 px-8 py-4 bg-acid text-black font-bold tracking-wider rounded-xl text-sm"
+                            className="inline-flex items-center gap-3 px-8 py-4 bg-amber-500 text-black font-bold tracking-wider rounded-xl text-sm"
                         >
                             <Zap className="w-4 h-4" />
-                            Schedule Demo
+                            Explore Projects
                             <ArrowRight className="w-4 h-4" />
                         </motion.button>
                     </Link>
@@ -210,13 +210,13 @@ export default function PlatformPage() {
             <footer className="border-t border-border px-6 md:px-12 py-8">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded bg-acid flex items-center justify-center">
-                            <Zap className="w-3 h-3 text-void" />
+                        <div className="w-5 h-5 rounded bg-amber-500 flex items-center justify-center">
+                            <Zap className="w-3 h-3 text-white" />
                         </div>
-                        <span className="text-xs font-mono text-dim">GridGuard AI © 2026</span>
+                        <span className="text-xs font-mono text-dim">SolarShare © 2026</span>
                     </div>
                     <span className="text-[10px] font-mono text-zinc-700 tracking-wider">
-                        BUILT FOR HUAWEI CLOUD HACKATHON 2026
+                        COMMUNITY SOLAR CO-OWNERSHIP PLATFORM
                     </span>
                 </div>
             </footer>

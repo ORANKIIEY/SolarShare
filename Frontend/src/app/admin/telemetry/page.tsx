@@ -97,7 +97,7 @@ export default function TelemetryPage() {
           <HarmonicChart />
         </div>
 
-        {/* Chart 2: Reuse the Ghost Load Chart for context */}
+        {/* Chart 2: Reuse the Unmetered Gap Chart for context */}
         <div>
           <div className="mb-4 flex items-center gap-2">
             <div className="w-2 h-2 bg-red-600 rounded-sm"></div>
@@ -121,7 +121,7 @@ export default function TelemetryPage() {
             </div>
             <p className="text-xs text-gray-700 font-mono leading-relaxed">
               Live heartbeat from the edge sensing device. 
-              Encrypted MQTT tunnel active via Huawei Cloud IoT.
+              Encrypted MQTT tunnel active for ESP32 meter telemetry.
             </p>
             <div className="pt-4 flex gap-3">
               <div className="px-3 py-1 bg-green-100 text-green-700 border border-green-200 rounded text-[10px] font-mono flex items-center gap-1.5">

@@ -147,10 +147,10 @@ export default function SectorsPage() {
             {/* Nav */}
             <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 py-4 border-b border-border/50 backdrop-blur-xl bg-void/70">
                 <Link href="/" className="flex items-center gap-3">
-                    <div className="w-7 h-7 rounded-md bg-acid flex items-center justify-center">
-                        <Zap className="w-4 h-4 text-void" />
+                    <div className="w-7 h-7 rounded-md bg-amber-500 flex items-center justify-center">
+                        <Zap className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-white tracking-tight text-sm">GridGuard <span className="text-acid">AI</span></span>
+                    <span className="font-bold text-white tracking-tight text-sm">Solar<span className="text-amber-500">Share</span></span>
                 </Link>
                 <div className="hidden md:flex items-center gap-8">
                     <Link href="/platform" className="text-xs font-mono text-zinc-500 hover:text-white transition-colors tracking-wider">Platform</Link>
@@ -186,8 +186,8 @@ export default function SectorsPage() {
                             Active <span className="text-acid">Sectors</span>
                         </h1>
                         <p className="text-zinc-400 text-lg leading-relaxed">
-                            GridGuard AI monitors multiple sectors across the municipality. 
-                            Each zone is optimized for its unique load profile and theft patterns.
+                            SolarShare monitors community solar mini-grids across township sectors. 
+                            Each zone is optimized for clean energy production, local demand, and co-ownership returns.
                         </p>
                     </motion.div>
 
@@ -222,13 +222,13 @@ export default function SectorsPage() {
             <footer className="border-t border-border px-6 md:px-12 py-8">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded bg-acid flex items-center justify-center">
-                            <Zap className="w-3 h-3 text-void" />
+                        <div className="w-5 h-5 rounded bg-amber-500 flex items-center justify-center">
+                            <Zap className="w-3 h-3 text-white" />
                         </div>
-                        <span className="text-xs font-mono text-dim">GridGuard AI © 2026</span>
+                        <span className="text-xs font-mono text-dim">SolarShare © 2026</span>
                     </div>
                     <span className="text-[10px] font-mono text-zinc-700 tracking-wider">
-                        BUILT FOR HUAWEI CLOUD HACKATHON 2026
+                        COMMUNITY SOLAR CO-OWNERSHIP PLATFORM
                     </span>
                 </div>
             </footer>

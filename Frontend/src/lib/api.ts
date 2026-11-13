@@ -1,5 +1,5 @@
 /**
- * GridGuard AI — Frontend API Client
+ * SolarShare — Frontend API Client
  * 
  * Every call is wrapped in try/catch with graceful fallback.
  * If the backend is unreachable, returns null so callers fall back to mock data.
@@ -18,7 +18,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 async function request<T>(path: string, options?: RequestInit): Promise<T | null> {
     try {
-        const token = typeof window !== "undefined" ? localStorage.getItem("gridguard_token") : null;
+        const token = typeof window !== "undefined" ? localStorage.getItem("solarshare_token") : null;
         const headers: Record<string, string> = {
             "Content-Type": "application/json",
             ...(options?.headers as Record<string, string> || {}),
@@ -60,55 +60,83 @@ export async function apiLogin(email: string, password: string, recaptchaToken?:
         }
         
         // If backend returns 401 or other error, check for demo credentials
-        if (email === "thabo@gridguard.co.za" && password === "gridguard123") {
+        const demoOperatorEmail = process.env.NEXT_PUBLIC_DEMO_OPERATOR_EMAIL || "operator@solarshare.co.za";
+        const demoOperatorPass = process.env.NEXT_PUBLIC_DEMO_OPERATOR_PASSWORD || "operator123";
+        if (email === demoOperatorEmail && password === demoOperatorPass) {
             return {
-                token: "demo-token-admin",
-                user: { id: "1", email: "thabo@gridguard.co.za", name: "Thabo Mokoena", role: "worker" }
+                token: "demo-token-operator",
+                user: { id: "0", email: demoOperatorEmail, name: "Solar Operator", role: "operator" }
             };
         }
-        if (email === "patrick@gridguard.co.za" && password === "governance123") {
+        if (email === "investor@solarshare.co.za" && password === "investor123") {
+            return {
+                token: "demo-token-investor",
+                user: { id: "inv-1", email: "investor@solarshare.co.za", name: "Solar Investor", role: "investor" }
+            };
+        }
+        if (email === "thabo@solarshare.co.za" && password === "solarshare123") {
+            return {
+                token: "demo-token-worker",
+                user: { id: "1", email: "thabo@solarshare.co.za", name: "Thabo Mokoena", role: "worker" }
+            };
+        }
+        if (email === "patrick@solarshare.co.za" && password === "governance123") {
             return {
                 token: "demo-token-governance",
-                user: { id: "2", email: "patrick@gridguard.co.za", name: "Patrick Nkosi", role: "governance" }
+                user: { id: "2", email: "patrick@solarshare.co.za", name: "Patrick Nkosi", role: "governance" }
             };
         }
-        if (email === "shawn@gridguard.co.za" && password === "dev123") {
+        if (email === "shawn@solarshare.co.za" && password === "dev123") {
             return {
                 token: "demo-token-dev",
-                user: { id: "3", email: "shawn@gridguard.co.za", name: "Shawn The Creator", role: "dev" }
+                user: { id: "3", email: "shawn@solarshare.co.za", name: "Shawn The Creator", role: "dev" }
             };
         }
-        if (email === "admin@gridguard.co.za" && password === "admin123") {
+        if (email === "admin@solarshare.co.za" && password === "admin123") {
             return {
                 token: "demo-token-admin",
-                user: { id: "4", email: "admin@gridguard.co.za", name: "System Admin", role: "admin" }
+                user: { id: "4", email: "admin@solarshare.co.za", name: "System Admin", role: "operator" }
             };
         }
         return null;
     } catch {
         // Network error - fallback to demo if credentials match
-        if (email === "thabo@gridguard.co.za" && password === "gridguard123") {
+        const demoOperatorEmail = process.env.NEXT_PUBLIC_DEMO_OPERATOR_EMAIL || "operator@solarshare.co.za";
+        const demoOperatorPass = process.env.NEXT_PUBLIC_DEMO_OPERATOR_PASSWORD || "operator123";
+        if (email === demoOperatorEmail && password === demoOperatorPass) {
             return {
-                token: "demo-token-admin",
-                user: { id: "1", email: "thabo@gridguard.co.za", name: "Thabo Mokoena", role: "worker" }
+                token: "demo-token-operator",
+                user: { id: "0", email: demoOperatorEmail, name: "Solar Operator", role: "operator" }
             };
         }
-        if (email === "patrick@gridguard.co.za" && password === "governance123") {
+        if (email === "investor@solarshare.co.za" && password === "investor123") {
+            return {
+                token: "demo-token-investor",
+                user: { id: "inv-1", email: "investor@solarshare.co.za", name: "Solar Investor", role: "investor" }
+            };
+        }
+        if (email === "thabo@solarshare.co.za" && password === "solarshare123") {
+            return {
+                token: "demo-token-worker",
+                user: { id: "1", email: "thabo@solarshare.co.za", name: "Thabo Mokoena", role: "worker" }
+            };
+        }
+        if (email === "patrick@solarshare.co.za" && password === "governance123") {
             return {
                 token: "demo-token-governance",
-                user: { id: "2", email: "patrick@gridguard.co.za", name: "Patrick Nkosi", role: "governance" }
+                user: { id: "2", email: "patrick@solarshare.co.za", name: "Patrick Nkosi", role: "governance" }
             };
         }
-        if (email === "shawn@gridguard.co.za" && password === "dev123") {
+        if (email === "shawn@solarshare.co.za" && password === "dev123") {
             return {
                 token: "demo-token-dev",
-                user: { id: "3", email: "shawn@gridguard.co.za", name: "Shawn The Creator", role: "dev" }
+                user: { id: "3", email: "shawn@solarshare.co.za", name: "Shawn The Creator", role: "dev" }
             };
         }
-        if (email === "admin@gridguard.co.za" && password === "admin123") {
+        if (email === "admin@solarshare.co.za" && password === "admin123") {
             return {
                 token: "demo-token-admin",
-                user: { id: "4", email: "admin@gridguard.co.za", name: "System Admin", role: "admin" }
+                user: { id: "4", email: "admin@solarshare.co.za", name: "System Admin", role: "operator" }
             };
         }
         return null;
@@ -370,7 +398,7 @@ export async function apiGetSystemHealth() {
 export async function apiGetServices() {
     return (await request<ServiceStatus[]>("/api/system/services")) || [
         {
-            name: "gridguard-api",
+            name: "solarshare-api",
             version: "v2.4.1",
             status: "running",
             cpu: 23,
@@ -413,8 +441,8 @@ export async function apiGetSystemLogs() {
         {
             timestamp: "10:45:23",
             level: "info",
-            service: "gridguard-api",
-            message: "Authentication successful for user thabo@gridguard.co.za"
+            service: "solarshare-api",
+            message: "Authentication successful for user thabo@solarshare.co.za"
         },
         {
             timestamp: "10:45:19",
@@ -437,7 +465,7 @@ export async function apiGetSystemLogs() {
         {
             timestamp: "10:45:08",
             level: "debug",
-            service: "gridguard-api",
+            service: "solarshare-api",
             message: "Cache hit for pole P-402 telemetry data"
         }
     ];

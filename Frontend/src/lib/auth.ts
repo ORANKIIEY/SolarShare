@@ -1,5 +1,5 @@
 /**
- * GridGuard AI — Auth Hook
+ * SolarShare — Auth Hook
  *
  * useRequireAuth: Reads the token from localStorage on mount.
  * If no token exists, redirects to /login immediately.
@@ -28,12 +28,12 @@ export function useRequireAuth(): StoredUser | null {
 
     useEffect(() => {
         try {
-            const token = localStorage.getItem("gridguard_token");
+            const token = localStorage.getItem("solarshare_token");
             if (!token) {
                 router.replace("/login");
                 return;
             }
-            const stored = localStorage.getItem("gridguard_user");
+            const stored = localStorage.getItem("solarshare_user");
             if (stored) {
                 setUser(JSON.parse(stored) as StoredUser);
             }
@@ -56,7 +56,7 @@ export function useAuth(): StoredUser | null {
 
     useEffect(() => {
         try {
-            const stored = localStorage.getItem("gridguard_user");
+            const stored = localStorage.getItem("solarshare_user");
             if (stored) setUser(JSON.parse(stored) as StoredUser);
         } catch { /* ignore */ }
     }, []);

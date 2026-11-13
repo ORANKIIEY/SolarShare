@@ -91,7 +91,9 @@ export default function DashboardPage() {
       <div className="flex justify-between items-end mb-8">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-lg bg-white border border-gray-200 flex items-center justify-center shadow-sm">
-            <img src="/Logo.webp" alt="GridGuard" className="w-8 h-8 object-contain" />
+            <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+              SS
+            </div>
           </div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight mb-2 font-sans text-black">
@@ -107,7 +109,7 @@ export default function DashboardPage() {
           <div className="text-right px-4 py-2 bg-white rounded-lg border border-gray-200">
             <div className="text-[10px] font-mono text-gray-500 uppercase">Est. Revenue Recovery</div>
             <div className="text-xl font-bold text-green-600 font-mono">{activeLosses} <span className="text-xs text-gray-500">/hr</span></div>
-            <div className="text-[9px] font-mono text-gray-400 mt-1">Ghost load × tariff</div>
+            <div className="text-[9px] font-mono text-gray-400 mt-1">Unmetered loss × tariff</div>
           </div>
           <div className="text-right px-4 py-2 bg-white rounded-lg border border-gray-200">
             <div className="text-[10px] font-mono text-gray-500 uppercase">Transformers at Risk</div>

@@ -24,7 +24,7 @@ export function useWorkOrders(assignedArea?: any) {
   const fetchWorkOrders = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('gridguard_token');
+      const token = localStorage.getItem('solarshare_token');
       
       // Try to fetch from backend incidents API
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/incidents`, {
@@ -101,7 +101,7 @@ export function useWorkOrders(assignedArea?: any) {
   // Update work order status
   const updateWorkOrderStatus = async (orderId: string, status: "pending" | "in_progress" | "completed") => {
     try {
-      const token = localStorage.getItem('gridguard_token');
+      const token = localStorage.getItem('solarshare_token');
       
       // Update backend incident status
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/incidents/${orderId}`, {
@@ -134,7 +134,7 @@ export function useWorkOrders(assignedArea?: any) {
   // Create new work order
   const createWorkOrder = async (workOrder: Omit<WorkOrder, 'id' | 'assignedAt'>) => {
     try {
-      const token = localStorage.getItem('gridguard_token');
+      const token = localStorage.getItem('solarshare_token');
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/incidents`, {
         method: 'POST',

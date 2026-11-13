@@ -21,8 +21,8 @@ export function proxy(request: NextRequest) {
   }
 
   // Get token and user from storage (for client-side requests)
-  const token = request.cookies.get('gridguard_token')?.value;
-  const userCookie = request.cookies.get('gridguard_user')?.value;
+  const token = request.cookies.get('solarshare_token')?.value;
+  const userCookie = request.cookies.get('solarshare_user')?.value;
   
   if (!token || !userCookie) {
     // Redirect to login if not authenticated

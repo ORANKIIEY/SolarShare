@@ -19,7 +19,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setMounted(true);
     // Check localStorage first
-    const savedTheme = localStorage.getItem("gridguard-theme") as Theme;
+    const savedTheme = localStorage.getItem("solarshare-theme") as Theme;
     if (savedTheme && (savedTheme === "light" || savedTheme === "dark")) {
       setThemeState(savedTheme);
     } else {
@@ -41,7 +41,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
     
     // Save to localStorage
-    localStorage.setItem("gridguard-theme", theme);
+    localStorage.setItem("solarshare-theme", theme);
   }, [theme, mounted]);
 
   const toggleTheme = () => {

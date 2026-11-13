@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-interface User {
+export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'worker' | 'governance' | 'dev';
+  role: 'admin' | 'worker' | 'governance' | 'dev' | 'operator' | 'investor';
 }
 
 export function useAuth(requiredRole?: User['role']) {
@@ -17,8 +17,8 @@ export function useAuth(requiredRole?: User['role']) {
 
   useEffect(() => {
     // Check authentication on mount
-    const token = localStorage.getItem('gridguard_token');
-    const userStr = localStorage.getItem('gridguard_user');
+    const token = localStorage.getItem('solarshare_token');
+    const userStr = localStorage.getItem('solarshare_user');
 
     if (!token || !userStr) {
       if (typeof window !== 'undefined') {
@@ -34,7 +34,7 @@ export function useAuth(requiredRole?: User['role']) {
       // Check if user has required role
       if (requiredRole && userData.role !== requiredRole) {
         // Redirect to appropriate dashboard
-        let redirectPath = '/admin';
+        let redirectPath = '/operator';
         switch (userData.role) {
           case 'worker':
             redirectPath = '/worker';
@@ -45,8 +45,12 @@ export function useAuth(requiredRole?: User['role']) {
           case 'dev':
             redirectPath = '/dev';
             break;
+          case 'operator':
           case 'admin':
-            redirectPath = '/admin';
+            redirectPath = '/operator';
+            break;
+          case 'investor':
+            redirectPath = '/solar';
             break;
         }
         router.push(redirectPath);
@@ -54,8 +58,10 @@ export function useAuth(requiredRole?: User['role']) {
       }
     } catch (error) {
       console.error('Invalid user data:', error);
-      localStorage.removeItem('gridguard_token');
-      localStorage.removeItem('gridguard_user');
+      localStorage.removeItem('solarshare_token');
+      localStorage.removeItem('solarshare_user');
+      document.cookie = "solarshare_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie = "solarshare_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       router.push('/login');
     } finally {
       setLoading(false);
@@ -63,8 +69,10 @@ export function useAuth(requiredRole?: User['role']) {
   }, [requiredRole, router]);
 
   const logout = () => {
-    localStorage.removeItem('gridguard_token');
-    localStorage.removeItem('gridguard_user');
+    localStorage.removeItem('solarshare_token');
+    localStorage.removeItem('solarshare_user');
+    document.cookie = "solarshare_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = "solarshare_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     setUser(null);
     router.push('/login');
   };

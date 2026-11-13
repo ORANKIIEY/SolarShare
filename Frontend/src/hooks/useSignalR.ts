@@ -1,5 +1,5 @@
 /**
- * useSignalR — connects to the GridGuard SignalR hub and listens for theft alerts and ESP32 updates.
+ * useSignalR — connects to the SolarShare SignalR hub and listens for telemetry alerts and ESP32 updates.
  * Install: npm install @microsoft/signalr
  */
 "use client";
@@ -30,8 +30,8 @@ export interface EdgeDeviceUpdate {
 
 const HUB_URL =
     process.env.NEXT_PUBLIC_API_URL
-        ? `${process.env.NEXT_PUBLIC_API_URL}/hubs/gridguard`
-        : "http://localhost:5000/hubs/gridguard";
+        ? `${process.env.NEXT_PUBLIC_API_URL}/hubs/solarshare`
+        : "http://localhost:5000/hubs/solarshare";
 
 export function useSignalR(
     onEdgeDeviceUpdate?: (update: EdgeDeviceUpdate) => void
@@ -50,7 +50,7 @@ export function useSignalR(
     useEffect(() => {
         const connection = new signalR.HubConnectionBuilder()
             .withUrl(HUB_URL, {
-                accessTokenFactory: () => localStorage.getItem("gridguard_token") ?? "",
+                accessTokenFactory: () => localStorage.getItem("solarshare_token") ?? "",
             })
             .withAutomaticReconnect()
             .configureLogging(signalR.LogLevel.Warning)
