@@ -89,6 +89,60 @@ export const STATUS_STYLE: Record<
   },
 };
 
+/** Status pill colours on the dark platform. */
+export const DARK_PILL: Record<MeterStatus, string> = {
+  [MeterStatus.OK]: "bg-emerald-950/70 text-emerald-300 border-emerald-800",
+  [MeterStatus.THEFT]: "bg-red-950/80 text-red-300 border-red-800",
+  [MeterStatus.TAMPER]: "bg-orange-950/80 text-orange-300 border-orange-800",
+  [MeterStatus.OFFLINE]: "bg-zinc-800 text-zinc-300 border-zinc-700",
+};
+
+/** A titled card on the dark platform. */
+export function Panel({
+  title,
+  action,
+  children,
+  className = "",
+  id,
+}: {
+  title?: React.ReactNode;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+  id?: string;
+}) {
+  return (
+    <section aria-labelledby={title && id ? id : undefined} className={`bg-d-panel border border-d-line rounded-lg ${className}`}>
+      {title && (
+        <div className="flex items-center justify-between gap-3 px-4 sm:px-5 h-12 border-b border-d-line">
+          <h2 id={id} className="text-[13px] font-medium text-white">
+            {title}
+          </h2>
+          {action}
+        </div>
+      )}
+      <div className="p-4 sm:p-5">{children}</div>
+    </section>
+  );
+}
+
+/** Key / value row like the dashboard's info panel. */
+export function KV({ k, v }: { k: React.ReactNode; v: React.ReactNode }) {
+  return (
+    <div className="flex justify-between items-center gap-4 text-[13px] py-1.5">
+      <dt className="text-zinc-400">{k}</dt>
+      <dd className="text-zinc-100 text-right tabular-nums">{v}</dd>
+    </div>
+  );
+}
+
+export const darkButton =
+  "inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-md text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
+export const primaryBtn = `${darkButton} bg-white text-black hover:bg-zinc-200`;
+export const secondaryBtn = `${darkButton} bg-zinc-800 text-zinc-100 border border-zinc-700 hover:bg-zinc-700`;
+export const inputCls =
+  "w-full min-h-11 rounded-md bg-d-input border border-d-line-2 px-3 text-base text-white placeholder:text-zinc-500 focus:border-zinc-400";
+
 export function ExternalA({
   href,
   children,

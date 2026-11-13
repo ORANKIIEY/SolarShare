@@ -6,6 +6,35 @@
   --color-paper: #f2f2f2;
   --color-paper-2: #f7f7f7;
   --color-ink: #0a0a0a;
+
+  /* Platform (dark dashboard) */
+  --color-d-main: #0f0f10;
+  --color-d-side: #0b0b0c;
+  --color-d-panel: #111113;
+  --color-d-hover: #1f1f21;
+  --color-d-active: #202022;
+  --color-d-input: #161618;
+  --color-d-line: #222224;
+  --color-d-line-2: #2e2e30;
+  --color-d-text: #e4e4e6;
+}
+
+.platform {
+  background: var(--color-d-main);
+  color: var(--color-d-text);
+  color-scheme: dark;
+}
+.platform ::selection {
+  background: #3f3f46;
+  color: #fff;
+}
+.platform ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.platform ::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
 }
 
 html {

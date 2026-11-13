@@ -5,16 +5,13 @@ import { ArrowUpRight, CircleCheck, CircleX, FileText, Fingerprint, LoaderCircle
 import { Container, ExternalA, SectionHead } from "@/components/ui";
 import { useLang } from "@/i18n/LanguageProvider";
 import { addressUrl, deployment, readDocuments, sha256Hex, shortHex, type ChainDocument } from "@/lib/chain";
+import { verifyDocument, type DocCheck } from "@/lib/documents";
 import { MeterPanel } from "./MeterLive";
 
-type Check =
-  | { state: "idle" }
-  | { state: "checking" }
-  | { state: "done"; match: boolean; fileHash: string; chainHash: string }
-  | { state: "failed" };
+type Check = DocCheck;
 
 /** The three sample documents, with the onchain record once it loads. */
-function useDocuments() {
+export function useDocuments() {
   const [chain, setChain] = useState<ChainDocument[] | null>(null);
   useEffect(() => {
     readDocuments().then(setChain, () => setChain(null));
@@ -48,18 +45,7 @@ function DocumentCard({ doc }: { doc: ReturnType<typeof useDocuments>[number] })
 
   async function verify() {
     setCheck({ state: "checking" });
-    try {
-      // Always compare with a fresh read of the blockchain, never a cached copy.
-      const onchain = (await readDocuments()).find((c) => c.name === doc.name);
-      if (!onchain) throw new Error("not on chain");
-      const res = await fetch(onchain.uri, { cache: "no-store" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const fileHash = await sha256Hex(await res.arrayBuffer());
-      const chainHash = onchain.sha256Hash.toLowerCase();
-      setCheck({ state: "done", match: fileHash === chainHash, fileHash, chainHash });
-    } catch {
-      setCheck({ state: "failed" });
-    }
+    setCheck(await verifyDocument(doc.name));
   }
 
   return (
@@ -212,7 +198,6 @@ export default function Trust() {
                     <ExternalA
                       href={addressUrl(address)}
                       className="group flex flex-col gap-1 p-5 h-full hover:bg-white transition-colors"
-                      label={`${t.trust.contracts[name]}: ${address} (Basescan)`}
                     >
                       <span className="text-sm font-semibold">{t.trust.contracts[name]}</span>
                       <span className="font-mono text-xs text-zinc-700">{shortHex(address, 6)}</span>

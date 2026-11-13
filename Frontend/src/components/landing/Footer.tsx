@@ -28,9 +28,9 @@ function Wordmark() {
   return (
     <p
       ref={ref}
-      aria-label="SolarShare"
       className="wordmark text-[17.5vw] xl:text-[15.5rem] font-semibold tracking-[-0.06em] leading-[0.8] text-center whitespace-nowrap text-[#f5f4e8] select-none"
     >
+      <span className="sr-only">SolarShare</span>
       {"SolarShare".split("").map((c, i) => (
         <span key={i} aria-hidden="true" className="letter" style={{ "--i": i } as React.CSSProperties}>
           {c}

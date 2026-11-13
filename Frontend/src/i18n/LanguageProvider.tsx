@@ -53,7 +53,15 @@ export function useLang(): LangCtx {
 }
 
 /** Two-button switch: English / isiZulu. */
-export function LanguageToggle({ dark = false, className = "" }: { dark?: boolean; className?: string }) {
+export function LanguageToggle({
+  dark = false,
+  compact = false,
+  className = "",
+}: {
+  dark?: boolean;
+  compact?: boolean; // "EN" / "ZU" on small screens
+  className?: string;
+}) {
   const { lang, setLang, t } = useLang();
   const base = dark ? "border-zinc-700" : "border-zinc-300";
   return (
@@ -74,9 +82,16 @@ export function LanguageToggle({ dark = false, className = "" }: { dark?: boolea
             lang={l}
             aria-pressed={on}
             onClick={() => setLang(l)}
-            className={`px-3 py-2 min-h-11 text-xs font-semibold tracking-widest uppercase transition-colors ${cls}`}
+            className={`${compact ? "px-2.5 min-w-11" : "px-3"} py-2 min-h-11 text-xs font-semibold tracking-widest uppercase transition-colors ${cls}`}
           >
-            {LANGS[l].langName}
+            {compact ? (
+              <>
+                {l.toUpperCase()}
+                <span className="sr-only"> ({LANGS[l].langName})</span>
+              </>
+            ) : (
+              LANGS[l].langName
+            )}
           </button>
         );
       })}

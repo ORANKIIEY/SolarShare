@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useState } from "react";
 import { ArrowUpRight, Minus, Plus } from "lucide-react";
 import { Container, Corners, ExternalA, SectionHead } from "@/components/ui";
 import { useLang } from "@/i18n/LanguageProvider";
@@ -22,7 +22,7 @@ const estimate = (n: number) => ({
 export default function Estimate() {
   const { t } = useLang();
   const [n, setN] = useState(20);
-  const id = useId();
+  const id = "estimate-calc";
   const ex = estimate(20);
   const e = estimate(n);
   const clamp = (v: number) => Math.max(1, Math.min(200, Math.round(v) || 1));
