@@ -1,17 +1,16 @@
 import type { NextConfig } from "next";
 import path from "path";
 
-// Work Breakdown: Vercel/Netlify \u2192 Huawei Cloud Application Engine (CAE)
-// `output: 'standalone'` creates a self-contained server bundle for Docker/CAE.
-// The Dockerfile in this directory copies `.next/standalone` for the final image.
+/**
+ * SolarShare Next.js Configuration
+ * Configured with strict security headers, Base Sepolia Web3 RPC connectivity, and standalone container output.
+ */
 const nextConfig: NextConfig = {
   output: "standalone",
   turbopack: {
     root: path.resolve(__dirname),
   },
 
-  // Security headers \u2014 complement Huawei WAF OWASP rule set
-  // (Work Breakdown: Zero Trust Architecture, WAF rate limiting)
   async headers() {
     return [
       {
@@ -23,15 +22,14 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Content-Security-Policy",
-            // Tiles served via Huawei CDN from OpenStreetMap origin
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: *.tile.openstreetmap.org tile.openstreetmap.org *.myhuaweicloud.com https://cdnjs.cloudflare.com",
-              "connect-src 'self' *.myhuaweicloud.com wss: ws:",
-              "frame-src 'self' https://www.openstreetmap.org https://www.google.com",
-              "font-src 'self'",
+              "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://raw.githubusercontent.com",
+              "connect-src 'self' https://sepolia.base.org https://*.base.org https://sepolia.basescan.org https://api-sepolia.basescan.org wss: ws:",
+              "frame-src 'self' https://www.openstreetmap.org",
+              "font-src 'self' data:",
             ].join("; "),
           },
         ],
