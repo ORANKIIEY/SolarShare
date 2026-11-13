@@ -12,7 +12,23 @@ import type { NextRequest } from 'next/server';
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Check Protected Operator Routes (take priority over public /solar paths)
+  // 1. Redirect legacy utility dashboard pages to /solar (#25)
+  const legacyPrefixes = [
+    '/admin',
+    '/worker',
+    '/governance',
+    '/dev',
+    '/sectors',
+    '/platform',
+    '/compliance',
+    '/blog',
+  ];
+
+  if (legacyPrefixes.some(prefix => pathname === prefix || pathname.startsWith(prefix + '/'))) {
+    return NextResponse.redirect(new URL('/solar', request.url));
+  }
+
+  // 2. Check Protected Operator Routes (take priority over public /solar paths)
   const isOperatorRoute =
     pathname === '/operator' ||
     pathname.startsWith('/operator/') ||
@@ -26,10 +42,6 @@ export function proxy(request: NextRequest) {
     '/login',
     '/signup',
     '/solar',
-    '/blog',
-    '/sectors',
-    '/platform',
-    '/compliance',
   ];
 
   const isPublic =

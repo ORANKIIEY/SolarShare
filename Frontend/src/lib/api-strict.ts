@@ -677,9 +677,6 @@ export const apiGetRolesAdminStrict = () => request("/api/admin/roles");
 // Admin Audit
 export const apiGetAuditLogAdminStrict = () => request("/api/admin/audit");
 
-// Admin Billing
-export const apiGetBillingSettingsAdminStrict = () => request("/api/admin/billing/settings");
-
 // Admin Plans
 export const apiGetPlansAdminStrict = () => request("/api/admin/plans");
 

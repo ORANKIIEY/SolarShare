@@ -5,14 +5,21 @@
  * If the backend is unreachable, returns null so callers fall back to mock data.
  */
 
-import { 
-    MOCK_ASSETS, 
-    MOCK_DASHBOARD_SUMMARY, 
-    MOCK_INCIDENTS, 
-    MOCK_NOTIFICATIONS, 
-    MOCK_TELEMETRY,
-    SYSTEM_LOGS
-} from "./data";
+// Clean mock fallbacks for legacy API client
+const MOCK_DASHBOARD_SUMMARY = {
+    totalNodes: 0,
+    activeAlerts: 0,
+    investigatingCount: 0,
+    avgLoad: 0,
+    latestConfidence: 0,
+    totalSectorLoad: 0,
+    activeLosses: 0
+};
+const MOCK_ASSETS: any[] = [];
+const MOCK_INCIDENTS: any[] = [];
+const MOCK_NOTIFICATIONS: any[] = [];
+const MOCK_TELEMETRY: any[] = [];
+const SYSTEM_LOGS: any[] = [];
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 

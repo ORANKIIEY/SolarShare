@@ -4,8 +4,19 @@ import React, { useState, useEffect } from "react";
 import { Bell, Search, User, LogOut, Sun } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { MOCK_ASSETS } from "@/lib/data";
 import { useToast } from "@/components/ui/Toast";
+
+interface SolarAssetSearchItem {
+  id: string;
+  type: string;
+  location: string;
+}
+
+const SOLAR_ASSETS: SolarAssetSearchItem[] = [
+  { id: "BLOCK-A", type: "10 kWp Solar Mini-Grid", location: "Block A, Gauteng" },
+  { id: "METER-01", type: "ESP32 Meter Oracle", location: "Block A Central Inverter" },
+  { id: "SSBA", type: "SolarShare Token (3,500 shares)", location: "Base Sepolia Public Record Book" },
+];
 
 export function Header() {
   const router = useRouter();
@@ -15,14 +26,15 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [searchResults, setSearchResults] = useState<typeof MOCK_ASSETS>([]);
+  const [searchResults, setSearchResults] = useState<SolarAssetSearchItem[]>([]);
 
   // Search Logic
   useEffect(() => {
     if (searchQuery.length > 0) {
-      const results = MOCK_ASSETS.filter(asset =>
+      const results = SOLAR_ASSETS.filter(asset =>
         asset.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        asset.location.toLowerCase().includes(searchQuery.toLowerCase())
+        asset.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        asset.type.toLowerCase().includes(searchQuery.toLowerCase())
       ).slice(0, 5);
       setSearchResults(results);
     } else {
@@ -41,7 +53,7 @@ export function Header() {
 
   const handleAssetClick = (id: string) => {
     setSearchQuery(""); // Clear search
-    showToast(`Navigating to Asset ${id}...`, "info");
+    router.push("/solar");
   };
 
   return (
@@ -166,11 +178,11 @@ export function Header() {
                   <div className="text-[10px] text-gray-500 font-mono">Role: Operator</div>
                 </div>
                 <Link
-                  href="/admin/profile"
+                  href="/solar/operator"
                   onClick={() => setIsUserMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-2.5 text-xs text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
                 >
-                  <User className="w-3.5 h-3.5" /> My Profile
+                  <User className="w-3.5 h-3.5" /> Operator Console
                 </Link>
                 <button
                   onClick={handleLogout}
