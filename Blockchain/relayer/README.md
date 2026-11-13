@@ -131,7 +131,7 @@ The scripted demo (`npm run relayer:demo`):
 | Theft | 3 | an illegal connection: sold is only 65% of produced → **THEFT**, payouts paused |
 | Recovery | 3 | back to normal → **OK** by itself |
 | Tamper (`--tamper` or `--full`) | 2 | meter case opened → **TAMPER**; stays TAMPER until the admin's `clearTamper`, which the script then calls (only if the relayer wallet is an admin) → **OK** |
-| Offline (`--offline` or `--full`) | 0, then 2 | silence → **OFFLINE** after `offlineTimeout` (600 s unless an operator lowered it; on a local chain the script fast-forwards the clock) → **OK** when readings resume |
+| Offline (`--offline` or `--full`) | 0, then 2 | silence → **OFFLINE** after `offlineTimeout` (120 s with the demo deploy; on a local chain the script fast-forwards the clock) → **OK** when readings resume |
 
 Each reading counts as 30 seconds of sunshine at about 5 kW (~42 Wh), like the
 real meter, even though the software meter sends one every few seconds.
@@ -184,19 +184,82 @@ The Wokwi meter can't be used against a local chain: it signs for Base Sepolia
 (chain 84532). Locally, its readings are rejected with a message saying which
 contract and chain it must sign for.
 
-## On Base Sepolia (after #11)
+## On Base Sepolia
 
-1. Deploy (#11). That writes `deployments/baseSepolia.json`.
-2. Set the Wokwi meter's `verifyingContract` (in its `secrets.h`) to the
-   MeterOracle address from that file.
+1. `npm run preflight:baseSepolia`, then `npm run deploy:baseSepolia` (#11).
+   That writes `deployments/baseSepolia.json` and prints the next steps.
+2. Set the Wokwi meter's `VERIFYING_CONTRACT` (in its `secrets.h`) to the
+   MeterOracle address the deploy printed.
 3. In `relayer/.env`: `NETWORK=baseSepolia` and `RELAYER_PRIVATE_KEY=` a
    testnet wallet with a little Base Sepolia ETH (each reading costs a fraction
    of a cent of test ETH).
 4. `npm run relayer`. The start-up banner shows the wallet's balance and warns if
    it is empty.
 
-For a quicker OFFLINE step on stage, an operator can lower the timeout with
-`MeterOracle.setOfflineTimeout` (for example to 60 seconds).
+The demo deploy sets OFFLINE to 120 s without a reading (4 missed readings).
+An operator can change it with `MeterOracle.setOfflineTimeout`, or set
+`OFFLINE_TIMEOUT_S` in `Blockchain/.env` before deploying.
+
+## Sponsor: hide gas from investors (#16)
+
+> **Demo shortcut, testnet only.** In production this would be a smart wallet
+> (ERC-4337) with a **paymaster** that pays the gas inside the investor's own
+> transaction, so no ETH would be sent around at all.
+
+Every transaction costs a little ETH for gas. A new investor has none. The
+sponsor is a tiny web service: the web app calls `POST /sponsor {address}` once
+the wallet is approved, and the sponsor sends that wallet a little Base Sepolia
+ETH (default: tops up to 0.0005 ETH, enough for hundreds of transactions) and
+some test USDC to buy shares with (default: tops up to 25 USDC). The API is in
+[`interface/README.md`](../interface/README.md#sponsored-fees-16-hide-gas-from-investors).
+
+```bash
+npm run sponsor      # from Blockchain/; listens on http://127.0.0.1:8787
+```
+
+**Why its own process, not part of the relayer?** They do different jobs with
+different wallets. If the sponsor were drained or busy, the relayer must still
+get every meter reading onchain: separate wallets mean they never compete for
+gas money or transaction numbers (nonces), and you can restart one without the
+other. It shares the relayer's folder, settings file and network code, so
+there's nothing extra to install.
+
+**Who gets money:** only wallets that are **approved on SolarShareToken**
+(`isApproved`) and not frozen. That's the main protection: a random wallet gets
+`403 NOT_APPROVED` and nothing is sent. On top of that:
+
+| Setting (`relayer/.env`) | Default | What it limits |
+| --- | --- | --- |
+| `SPONSOR_PER_WALLET_MAX` / `SPONSOR_PER_WALLET_WINDOW_H` | 1 per 24 h | top-ups per wallet |
+| `SPONSOR_MAX_PER_HOUR` | 30 | top-ups per hour, all wallets together |
+| `SPONSOR_TOTAL_ETH_CAP` | 0.05 ETH | ETH ever given away |
+| `SPONSOR_TOTAL_USDC_CAP` | 1000 USDC | USDC ever given away (after that: ETH only) |
+| `SPONSOR_ETH_AMOUNT`, `SPONSOR_USDC_AMOUNT` | 0.0005, 25 | top up **to** these balances; `SPONSOR_USDC_AMOUNT=0` turns USDC off |
+
+The counts are saved in `relayer/sponsor-ledger.<network>.json` (git-ignored),
+so restarting doesn't reset them. Delete that file to start fresh. Only one
+top-up runs at a time, so ten clicks at once still send once.
+
+It only runs on Base Sepolia or a local Hardhat node: it refuses to start on
+any other chain.
+
+**Set-up on Base Sepolia:** make a separate TEST wallet for it (for example
+`npm run wallet:new` in a scratch copy, or any wallet app), put its key in
+`SPONSOR_PRIVATE_KEY`, and send it some Base Sepolia ETH and test USDC (from
+<https://faucet.circle.com>). 0.01 ETH covers 20 investors. The start-up line
+shows its balances. If the web app is on another computer, set
+`SPONSOR_HOST=0.0.0.0` and list the app's address in `SPONSOR_ALLOWED_ORIGINS`.
+
+**Log lines**
+
+```
+04:51:10 sponsor: topped up 0x3f2a…91c0: 0.0005 ETH + 25.0 USDC  (total given: 0.0015 ETH, 75 USDC)
+04:51:32 WARN sponsor: refused 0x8b11…02de: not approved on SolarShareToken
+04:52:05 WARN sponsor: refused 0x3f2a…91c0: WALLET_LIMIT: This wallet was already topped up 1 time(s) in the last 1 day(s).
+```
+
+Locally (`npm run node` + `npm run deploy:local`) it needs no key: the node's
+first test account pays, with the deploy's FAKE MockUSDC.
 
 ## Tests
 
@@ -210,6 +273,10 @@ CI too. They live in `test/relayer/`:
   and full demo sequences, a tampered message rejected without sending anything,
   duplicates skipped (also after a restart), readings the contract would refuse,
   safe retries after network failures, and replaying a recording.
+- `sponsor.ts`: the sponsor's approval check (unapproved, frozen, bad
+  address), every rate limit and cap, the ledger surviving a restart, ten
+  requests at once, and end to end over HTTP: a brand-new wallet with no ETH is
+  refused, approved, topped up, and then buys shares with its own key.
 
 `npm run relayer:typecheck` type-checks the relayer code.
 
@@ -227,3 +294,4 @@ CI too. They live in `test/relayer/`:
 | `src/softwareMeter.ts` | The demo backup meter and its scripted sequence. |
 | `src/chain.ts`, `src/config.ts` | Blockchain connection and settings. |
 | `src/abi.ts` | The MeterOracle functions the relayer calls. |
+| `src/sponsor/` | The sponsor: `main.ts` (start-up), `server.ts` (HTTP), `sponsor.ts` (approval check and top-ups), `limits.ts` (rate limits and ledger), `chain.ts`, `config.ts`. |

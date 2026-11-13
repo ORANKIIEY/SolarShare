@@ -16,7 +16,10 @@ TypeScript) and [OpenZeppelin Contracts v5](https://docs.openzeppelin.com/contra
 | --- | --- |
 | `contracts/` | Solidity contracts. `HelloSolarShare.sol` is only a toolchain smoke test. `spike/` holds the issue #4 signature check. |
 | `test/` | Tests. They run on a throwaway in-memory blockchain. |
-| `scripts/` | Deploy script, wallet helpers, and `verify-spike.ts` for the ESP32 spike. |
+| `scripts/` | Deploy, preflight and verify scripts, the sample-document builder, wallet helpers, and `verify-spike.ts` for the ESP32 spike. |
+| `deployments/` | Addresses + ABIs written by the deploy. `baseSepolia.json` is committed; local ones are git-ignored. |
+| `relayer/` | The relayer (meter readings → chain) and the sponsor (gas for new investors). See [`relayer/README.md`](relayer/README.md). |
+| `interface/` | What the web app needs: every read and write per screen, types, sample data, ABIs. |
 | `hardhat.config.ts` | Networks (`hardhat` local, `baseSepolia`) and contract verification on Basescan. |
 | `.env.example` | Template for your secrets. Copy it to `.env`. |
 
@@ -78,19 +81,71 @@ The wallet needs test ETH (for gas) and test USDC (for payouts). Both are free.
 
 ## Deploy
 
-```bash
-npm run deploy:baseSepolia
-```
+One command deploys all four contracts, connects them, registers the meter,
+sets the prices and limits, records the asset documents' hashes, and writes
+`deployments/<network>.json` (addresses + ABIs for the relayer and the web
+app). At the end it prints what to do next in plain English.
 
-For now this only checks the deployer account and its balance. The real
-contracts (SolarShareToken, MeterOracle, RevenueDistributor, ShareSale) are
-added in their own issues.
-
-To verify a deployed contract's source code on Basescan:
+**Locally** (no test money needed; uses a FAKE `MockUSDC`):
 
 ```bash
-npx hardhat verify --network baseSepolia <contract address> <constructor args...>
+npm run node          # terminal 1: a private blockchain on your laptop
+npm run deploy:local  # terminal 2
 ```
+
+**On Base Sepolia** (test network; uses Circle's test USDC
+`0x036CbD53842c5426634e7929541eC2318f3dCF7e`):
+
+```bash
+npm run preflight:baseSepolia   # checks the wallet, balances and settings; sends nothing
+npm run deploy:baseSepolia      # runs the same checks again, then deploys and verifies
+```
+
+Preflight lists every check as `OK`, `WARN` or `MISSING`, with what to do for
+each problem. The deploy refuses to start while anything is `MISSING`. It also
+refuses to deploy a second time over an existing `deployments/baseSepolia.json`
+(new contracts mean new addresses for the meter, relayer and web app) unless
+you run it with `REDEPLOY=1`.
+
+What it sets up:
+
+| Setting | Value | Change with (`Blockchain/.env`) |
+| --- | --- | --- |
+| Meter device (who may sign readings) | the Wokwi meter `0xaa69C29dA92fa7d0Ef717705Cd21Dd6e4D641ff3` | `METER_DEVICE_ADDRESS` |
+| Treasury (receives share-sale USDC) | the deployer | `TREASURY_ADDRESS` |
+| Share price / tariff | 5 USDC per share / 0.20 USDC per kWh | `scripts/lib/deployConfig.ts` |
+| Theft alarm | sold energy more than 15% behind produced | `scripts/lib/deployConfig.ts` |
+| OFFLINE after | 120 s without a reading (short, for the demo) | `OFFLINE_TIMEOUT_S` |
+| Asset documents | the 3 SAMPLE PDFs' SHA-256 hashes (see below) | `npm run docs:build` |
+| USDC | Circle test USDC on Base Sepolia, MockUSDC locally | `USE_MOCK_USDC=true` deploys a labelled MockUSDC on Base Sepolia too (only if the Circle faucet runs dry) |
+
+Roles: the deployer is admin, operator and KYC officer; ShareSale may create
+shares; the token reports every share move to RevenueDistributor; the
+deployer's own wallet is approved to hold shares.
+
+**Source verification.** With `BASESCAN_API_KEY` set, the deploy publishes the
+source code of every contract on sepolia.basescan.org, so anyone can read it
+there. Without a key it skips this and says so. Run it again any time:
+
+```bash
+npm run verify:baseSepolia
+```
+
+## Sample asset documents (#27)
+
+Three PDFs in [`docs/asset-documents/`](../docs/asset-documents/): an SPV
+company certificate, an installation certificate and a power purchase
+agreement. **They are SAMPLES, not real documents**: every page says so. The
+deploy stores each file's SHA-256 hash in SolarShareToken, so the web app can
+prove a downloaded file is the registered one.
+
+```bash
+npm run docs:build   # rebuilds the PDFs and hashes.json (same text = same bytes = same hashes)
+npm run docs:hash    # only recomputes hashes.json
+```
+
+If you change a document after deploying, run `docs:build` and update the
+onchain hash with `SolarShareToken.setDocument(name, newHash, uri)`.
 
 ## ESP32 signing spike (issue #4)
 
