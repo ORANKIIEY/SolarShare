@@ -14,3 +14,7 @@ ignition/deployments/chain-31337/
 
 # Serial output pasted from Wokwi for verify-spike (safe, but local only)
 spike-output.txt
+
+# Local deploy records (Base Sepolia's is committed)
+deployments/hardhat.json
+deployments/localhost.json
