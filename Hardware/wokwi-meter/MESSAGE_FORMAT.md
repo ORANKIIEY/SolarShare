@@ -36,26 +36,27 @@ One JSON object, UTF-8, no line breaks:
 {
   "reading": {
     "meterId": 1,
-    "seq": "1794571212",
-    "timestamp": "1794571416",
-    "energyProducedWh": "291",
-    "energySoldWh": "250",
-    "powerW": 5001,
-    "tamper": true
+    "seq": "1794529617",
+    "timestamp": "1794529908",
+    "energyProducedWh": "417",
+    "energySoldWh": "387",
+    "powerW": 5006,
+    "tamper": false
   },
   "signature": {
-    "r": "0xfa881bd3cc5e1c4b7583e2a224627dea9bee6563e5c81fdfc5124b7c69adc849",
-    "s": "0x3e830fd350d81f93d7dac30c3845fbf5efc39a9808523b8fadba780d1d29c771"
+    "r": "0x0b757cec4ba4e1a82e36c04ac8e94c10d618f8670a4f0774fcab4fe996425932",
+    "s": "0x254bec648514a375788336d6512721bd9efda7412cc12a8d0f216dd508b1ef66"
   },
-  "device": "0xCa0Cd29B1E728cF81357398401FaCe9a1cdA62BC"
+  "device": "0xaa69C29dA92fa7d0Ef717705Cd21Dd6e4D641ff3"
 }
 ```
 
-> This example was produced by the real `sketch.ino`, compiled and run on a
-> laptop with a throwaway test key, so `device` is not the demo meter's
-> address. With the placeholder contract `0x1111…1111`, its EIP-712 digest is
-> `0x0f543821f7307f0c94b9f3c47a95bd5e28c32c470d2d0af9abfce1c797deac47` and it
-> recovers to the `device` address with `v = 28`.
+> A real message from the demo meter running in Wokwi, captured from
+> `test.mosquitto.org` on 2026-11-13. With the placeholder contract
+> `0x1111…1111`, its EIP-712 digest is
+> `0x9f48f4c8afd38085fcdcb73561af3eac8f9e1d05d4af4816558f1e3b0383d03e` and it
+> recovers to the device address `0xaa69C29dA92fa7d0Ef717705Cd21Dd6e4D641ff3`
+> with `v = 28`.
 
 | Field | JSON type | Solidity type | Meaning |
 | --- | --- | --- | --- |
