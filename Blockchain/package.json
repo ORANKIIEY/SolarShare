@@ -12,10 +12,14 @@
     "deploy:baseSepolia": "hardhat run scripts/deploy.ts --network baseSepolia",
     "wallet:new": "tsx scripts/new-wallet.ts",
     "wallet:address": "tsx scripts/show-address.ts",
-    "verify-spike": "tsx scripts/verify-spike.ts"
+    "verify-spike": "tsx scripts/verify-spike.ts",
+    "relayer": "tsx relayer/src/main.ts",
+    "relayer:demo": "tsx relayer/src/main.ts --replay",
+    "relayer:typecheck": "tsc --noEmit -p relayer"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "5.6.1"
+    "@openzeppelin/contracts": "5.6.1",
+    "mqtt": "5.16.1"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ignition": "0.15.16",
