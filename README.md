@@ -108,7 +108,7 @@ In a one-week hackathon we build the onchain, meter and app layers for real, and
 
 | Part                                         | Folder                    | Status      |
 | -------------------------------------------- | ------------------------- | ----------- |
-| Smart contracts (token, oracle, distributor) | `Blockchain/`             | 🔨 Building |
+| Smart contracts (token, oracle, distributor) | `Blockchain/`             | ✅ Deployed |
 | Meter firmware that signs readings           | `Hardware/esp32-edge/`    | 🔨 Building |
 | Relayer (MQTT → Base Sepolia)                | `Blockchain/relayer/`     | 🔨 Building |
 | Investor and operator web pages              | `Frontend/src/app/solar/` | 🔨 Building |
@@ -116,11 +116,17 @@ In a one-week hackathon we build the onchain, meter and app layers for real, and
 
 ### Deployed contracts (Base Sepolia)
 
-| Contract           | Address          |
-| ------------------ | ---------------- |
-| SolarShareToken    | _to be deployed_ |
-| MeterOracle        | _to be deployed_ |
-| RevenueDistributor | _to be deployed_ |
+Chain id **84532** (Base Sepolia, a public test network: test money only). Click an address to see the contract and its source code on Basescan.
+
+| Contract           | Address                                                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| SolarShareToken    | [`0x025A0eA625e462A4906C9811dcde14075cBD8491`](https://sepolia.basescan.org/address/0x025A0eA625e462A4906C9811dcde14075cBD8491) |
+| MeterOracle        | [`0x3e2e7f87610d978b922f5bD18624101d30D7c8B6`](https://sepolia.basescan.org/address/0x3e2e7f87610d978b922f5bD18624101d30D7c8B6) |
+| RevenueDistributor | [`0x3CB94fb9C7AaF42c959A414da750dE2DE761942b`](https://sepolia.basescan.org/address/0x3CB94fb9C7AaF42c959A414da750dE2DE761942b) |
+| ShareSale          | [`0x652d15FEb0e57730b78A997c8decd46c81bf5cD2`](https://sepolia.basescan.org/address/0x652d15FEb0e57730b78A997c8decd46c81bf5cD2) |
+| USDC (Circle test) | [`0x036CbD53842c5426634e7929541eC2318f3dCF7e`](https://sepolia.basescan.org/address/0x036CbD53842c5426634e7929541eC2318f3dCF7e) |
+
+The full record (addresses, settings, transactions and ABIs) is in [`Blockchain/deployments/baseSepolia.json`](Blockchain/deployments/baseSepolia.json).
 
 ---
 
