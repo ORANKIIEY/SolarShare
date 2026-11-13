@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "author": "SolarShare",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    {
+      "type": "wokwi-slide-potentiometer",
+      "id": "sunlight",
+      "top": -120,
+      "left": 160,
+      "rotate": 0,
+      "attrs": { "travelLength": "30", "value": "512" }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "theft",
+      "top": -110,
+      "left": 400,
+      "attrs": { "value": "0" }
+    },
+    {
+      "type": "wokwi-slide-switch",
+      "id": "tamper",
+      "top": 150,
+      "left": 200,
+      "attrs": { "value": "" }
+    },
+    {
+      "type": "wokwi-slide-switch",
+      "id": "network",
+      "top": 150,
+      "left": 290,
+      "attrs": { "value": "" }
+    },
+    { "type": "wokwi-led", "id": "ledGreen", "top": 30, "left": -130, "attrs": { "color": "green" } },
+    { "type": "wokwi-led", "id": "ledYellow", "top": 30, "left": -90, "attrs": { "color": "yellow" } },
+    { "type": "wokwi-led", "id": "ledRed", "top": 30, "left": -50, "attrs": { "color": "red" } }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+
+    [ "sunlight:VCC", "esp:3V3", "red", [] ],
+    [ "sunlight:GND", "esp:GND.2", "black", [] ],
+    [ "sunlight:SIG", "esp:34", "orange", [] ],
+
+    [ "theft:VCC", "esp:3V3", "red", [] ],
+    [ "theft:GND", "esp:GND.2", "black", [] ],
+    [ "theft:SIG", "esp:35", "purple", [] ],
+
+    [ "tamper:2", "esp:27", "blue", [] ],
+    [ "tamper:3", "esp:GND.3", "black", [] ],
+
+    [ "network:2", "esp:14", "cyan", [] ],
+    [ "network:3", "esp:GND.3", "black", [] ],
+
+    [ "ledGreen:A", "esp:25", "green", [] ],
+    [ "ledGreen:C", "esp:GND.1", "black", [] ],
+    [ "ledYellow:A", "esp:26", "gold", [] ],
+    [ "ledYellow:C", "esp:GND.1", "black", [] ],
+    [ "ledRed:A", "esp:33", "red", [] ],
+    [ "ledRed:C", "esp:GND.1", "black", [] ]
+  ],
+  "dependencies": {}
+}
