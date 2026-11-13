@@ -110,7 +110,7 @@ In a one-week hackathon we build the onchain, meter and app layers for real, and
 | -------------------------------------------- | ------------------------- | ----------- |
 | Smart contracts (token, oracle, distributor) | `Blockchain/`             | ✅ Deployed |
 | Meter firmware that signs readings           | `Hardware/esp32-edge/`    | 🔨 Building |
-| Relayer (MQTT → Base Sepolia)                | `Blockchain/relayer/`     | 🔨 Building |
+| Relayer (MQTT → Base Sepolia)                | `Blockchain/relayer/`     | ✅ Live     |
 | Investor and operator web pages              | `Frontend/src/app/solar/` | 🔨 Building |
 | Dashboard and design system                  | `Frontend/`               | ✅ Existing |
 
@@ -127,6 +127,8 @@ Chain id **84532** (Base Sepolia, a public test network: test money only). Click
 | USDC (Circle test) | [`0x036CbD53842c5426634e7929541eC2318f3dCF7e`](https://sepolia.basescan.org/address/0x036CbD53842c5426634e7929541eC2318f3dCF7e) |
 
 The full record (addresses, settings, transactions and ABIs) is in [`Blockchain/deployments/baseSepolia.json`](Blockchain/deployments/baseSepolia.json).
+
+**Live meter proof (#5):** the Wokwi meter's signed readings reached MeterOracle through the relayer. Turning the theft dial switched the status to THEFT and paused payouts, and turning it back restored OK by itself. See [`docs/live-meter-proof/`](docs/live-meter-proof/README.md) for the transactions and the recorded readings.
 
 ---
 
