@@ -27,7 +27,7 @@ const Ctx = createContext<ChainData | null>(null);
 const METER_POLL_MS = 6_000;
 const STATS_POLL_MS = 30_000;
 
-export function ChainDataProvider({ children }: { children: React.ReactNode }) {
+export function ChainDataProvider({ children, meterPollMs = METER_POLL_MS }: { children: React.ReactNode; meterPollMs?: number }) {
   const [meter, setMeter] = useState<Load<MeterState>>({});
   const [stats, setStats] = useState<Load<AssetStats>>({});
   const [readings, setReadings] = useState<Load<Reading[]>>({});
@@ -70,13 +70,13 @@ export function ChainDataProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     refresh();
-    const m = setInterval(() => document.visibilityState === "visible" && loadMeter(), METER_POLL_MS);
+    const m = setInterval(() => document.visibilityState === "visible" && loadMeter(), meterPollMs);
     const s = setInterval(() => document.visibilityState === "visible" && loadStats(), STATS_POLL_MS);
     return () => {
       clearInterval(m);
       clearInterval(s);
     };
-  }, [refresh, loadMeter, loadStats]);
+  }, [refresh, loadMeter, loadStats, meterPollMs]);
 
   return <Ctx.Provider value={{ meter, stats, readings, refresh }}>{children}</Ctx.Provider>;
 }

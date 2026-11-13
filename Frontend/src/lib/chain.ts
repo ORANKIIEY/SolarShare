@@ -82,24 +82,49 @@ export interface Reading {
   blockNumber: bigint;
 }
 
-const readingEvent = C.MeterOracle.abi.find(
-  (x) => x.type === "event" && x.name === "ReadingAccepted",
-) as Extract<(typeof C.MeterOracle.abi)[number], { type: "event"; name: "ReadingAccepted" }>;
+// ---------------------------------------------------------------------------
+// Event history
+// ---------------------------------------------------------------------------
 
-/** The newest `limit` signed meter readings, newest first. */
-export async function readRecentReadings(limit = 6): Promise<Reading[]> {
+type AnyAbi = readonly { type: string; name?: string }[];
+type EventAbi = Extract<(typeof C.MeterOracle.abi)[number], { type: "event" }>;
+
+export interface EventLog<A = Record<string, unknown>> {
+  args: A;
+  txHash: Hex;
+  blockNumber: bigint;
+}
+
+/**
+ * The newest `limit` events of one kind, newest first. `args` filters on
+ * indexed fields (for example `{ account: me }`). Walks back from the latest
+ * block to the deploy block in the largest steps each endpoint allows.
+ */
+export async function readEvents<A = Record<string, unknown>>(
+  contract: { address: Address; abi: AnyAbi },
+  eventName: string,
+  opts: { limit?: number; args?: Record<string, unknown>; fromBlock?: bigint } = {},
+): Promise<EventLog<A>[]> {
+  const limit = opts.limit ?? 10;
+  const event = contract.abi.find((x) => x.type === "event" && x.name === eventName) as EventAbi | undefined;
+  if (!event) throw new Error(`No event ${eventName}`);
   let lastError: unknown;
   for (const { client, maxRange } of logClients) {
     try {
       const latest = await client.getBlockNumber();
-      const start = BigInt(deployment.startBlock);
-      const found: Reading[] = [];
+      const start = opts.fromBlock ?? BigInt(deployment.startBlock);
+      const found: EventLog<A>[] = [];
       for (let to = latest; to >= start && found.length < limit; to -= maxRange) {
         const from = to - maxRange + 1n > start ? to - maxRange + 1n : start;
-        const logs = await client.getLogs({ address: oracle.address, event: readingEvent, fromBlock: from, toBlock: to });
-        for (const l of logs.reverse()) {
-          const a = l.args as unknown as Omit<Reading, "txHash" | "blockNumber">;
-          found.push({ ...a, txHash: l.transactionHash as Hex, blockNumber: l.blockNumber as bigint });
+        const logs = await client.getLogs({
+          address: contract.address,
+          event,
+          args: opts.args as never,
+          fromBlock: from,
+          toBlock: to,
+        });
+        for (const l of [...logs].reverse()) {
+          found.push({ args: l.args as A, txHash: l.transactionHash as Hex, blockNumber: l.blockNumber as bigint });
         }
       }
       return found.slice(0, limit);
@@ -110,27 +135,133 @@ export async function readRecentReadings(limit = 6): Promise<Reading[]> {
   throw lastError;
 }
 
+/** The newest `limit` signed meter readings, newest first. */
+export async function readRecentReadings(limit = 6): Promise<Reading[]> {
+  const logs = await readEvents<Omit<Reading, "txHash" | "blockNumber">>(oracle, "ReadingAccepted", { limit });
+  return logs.map((l) => ({ ...l.args, txHash: l.txHash, blockNumber: l.blockNumber }));
+}
+
 // ---------------------------------------------------------------------------
-// Shares and documents
+// Shares, payouts and documents
 // ---------------------------------------------------------------------------
 
 export interface AssetStats {
   sharesSold: bigint;
   maxShares: bigint;
   pricePerShareUsdc: bigint; // 6 decimals
+  totalDeposited: bigint; // all income ever paid in (USDC, 6 decimals)
+  totalClaimed: bigint; // all payouts ever claimed
+  remainingDepositAllowance: bigint; // income the meter has proven but nobody paid in yet
+  salePaused: boolean;
 }
 
 export async function readAssetStats(): Promise<AssetStats> {
-  const [sharesSold, maxShares, pricePerShareUsdc] = await Promise.all([
-    publicClient.readContract({ ...token, functionName: "totalSupply" }),
-    publicClient.readContract({ ...token, functionName: "MAX_SUPPLY" }),
-    publicClient.readContract({ ...sale, functionName: "pricePerShare" }),
-  ]);
+  const [sharesSold, maxShares, pricePerShareUsdc, totalDeposited, totalClaimed, remainingDepositAllowance, salePaused] =
+    await Promise.all([
+      publicClient.readContract({ ...token, functionName: "totalSupply" }),
+      publicClient.readContract({ ...token, functionName: "MAX_SUPPLY" }),
+      publicClient.readContract({ ...sale, functionName: "pricePerShare" }),
+      publicClient.readContract({ ...distributor, functionName: "totalDeposited" }),
+      publicClient.readContract({ ...distributor, functionName: "totalClaimed" }),
+      publicClient.readContract({ ...distributor, functionName: "remainingDepositAllowance" }),
+      publicClient.readContract({ ...sale, functionName: "paused" }),
+    ]);
   return {
     sharesSold: sharesSold as bigint,
     maxShares: maxShares as bigint,
     pricePerShareUsdc: pricePerShareUsdc as bigint,
+    totalDeposited: totalDeposited as bigint,
+    totalClaimed: totalClaimed as bigint,
+    remainingDepositAllowance: remainingDepositAllowance as bigint,
+    salePaused: salePaused as boolean,
   };
+}
+
+/** Why someone can't claim: RevenueDistributor.claimBlocker. */
+export enum ClaimBlocker {
+  NONE = 0,
+  NOTHING_TO_CLAIM = 1,
+  METER_NOT_OK = 2,
+  NOT_APPROVED = 3,
+  FROZEN = 4,
+  PAUSED = 5,
+}
+
+export interface Holding {
+  shares: bigint;
+  usdc: bigint;
+  eth: bigint;
+  approved: boolean;
+  frozen: boolean;
+  pendingPayout: bigint;
+  claimBlocker: ClaimBlocker;
+  totalClaimed: bigint;
+  allowance: bigint; // USDC the share sale may take
+}
+
+export async function readHolding(who: Address): Promise<Holding> {
+  const [shares, usdcBal, eth, approved, frozen, pendingPayout, claimBlocker, totalClaimed, allowance] = await Promise.all([
+    publicClient.readContract({ ...token, functionName: "balanceOf", args: [who] }),
+    publicClient.readContract({ ...usdc, functionName: "balanceOf", args: [who] }),
+    publicClient.getBalance({ address: who }),
+    publicClient.readContract({ ...token, functionName: "isApproved", args: [who] }),
+    publicClient.readContract({ ...token, functionName: "isFrozen", args: [who] }),
+    publicClient.readContract({ ...distributor, functionName: "pendingPayout", args: [who] }),
+    publicClient.readContract({ ...distributor, functionName: "claimBlocker", args: [who] }),
+    publicClient.readContract({ ...distributor, functionName: "totalClaimedBy", args: [who] }),
+    publicClient.readContract({ ...usdc, functionName: "allowance", args: [who, sale.address] }),
+  ]);
+  return {
+    shares: shares as bigint,
+    usdc: usdcBal as bigint,
+    eth,
+    approved: approved as boolean,
+    frozen: frozen as boolean,
+    pendingPayout: pendingPayout as bigint,
+    claimBlocker: Number(claimBlocker) as ClaimBlocker,
+    totalClaimed: totalClaimed as bigint,
+    allowance: allowance as bigint,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Errors in plain words
+// ---------------------------------------------------------------------------
+
+/** Contract error names we explain to people. Anything else is "network". */
+export type ErrorCode =
+  | "AccountNotApproved"
+  | "AccountFrozen"
+  | "SoldOut"
+  | "ZeroAmount"
+  | "EnforcedPause"
+  | "NotEnoughMoney"
+  | "MeterNotOk"
+  | "NothingToClaim"
+  | "SharesPaused"
+  | "DepositExceedsAttestedEnergy"
+  | "NoSharesIssued"
+  | "Unauthorized"
+  | "network";
+
+/** Finds the contract's error name inside a viem error, if there is one. */
+export function errorCode(e: unknown): ErrorCode {
+  const seen = new Set<unknown>();
+  let cur: unknown = e;
+  while (cur && typeof cur === "object" && !seen.has(cur)) {
+    seen.add(cur);
+    const o = cur as { data?: { errorName?: string }; shortMessage?: string; cause?: unknown };
+    const name = o.data?.errorName;
+    if (name) {
+      if (name === "ERC20InsufficientBalance" || name === "ERC20InsufficientAllowance") return "NotEnoughMoney";
+      if (name === "AccessControlUnauthorizedAccount") return "Unauthorized";
+      if (name === "MaxSupplyExceeded") return "SoldOut";
+      return name as ErrorCode;
+    }
+    if (o.shortMessage && /insufficient funds/i.test(o.shortMessage)) return "NotEnoughMoney";
+    cur = o.cause;
+  }
+  return "network";
 }
 
 export interface ChainDocument {
