@@ -79,7 +79,7 @@ export default function MapLoader(props: any) {
           <div className="flex items-center gap-4 animate-pulse">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              <span className="text-[9px] font-mono text-gray-700 uppercase tracking-tighter">Huawei CDN Tiles Active</span>
+              <span className="text-[9px] font-mono text-gray-700 uppercase tracking-tighter">OpenStreetMap CDN Active</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />

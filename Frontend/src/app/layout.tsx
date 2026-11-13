@@ -1,19 +1,23 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { ToastProvider } from "@/components/ui/Toast";
 import CookieConsent from "@/components/CookieConsent";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
-
 export const metadata: Metadata = {
-  title: "GridGuard AI | Mission Control",
-  description: "Real-time municipal energy theft detection system.",
+  title: "SolarShare | Community Solar Co-Ownership",
+  description: "Buy a piece of a township solar mini-grid and earn monthly payouts from clean electricity sold to local homes and shops.",
+  openGraph: {
+    title: "SolarShare | Community Solar Co-Ownership",
+    description: "Buy a piece of a township solar mini-grid and earn monthly payouts from clean electricity sold to local homes and shops.",
+    url: "https://solarshare.co.za",
+    siteName: "SolarShare",
+    locale: "en_ZA",
+    type: "website",
+  },
   icons: {
-    icon: "/favicon.ico?v=2",
+    icon: "/favicon.ico",
   },
 };
 
@@ -23,13 +27,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className="font-sans">
       <body className="font-sans bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white transition-colors duration-300">
         <ThemeProvider>
-          <ToastProvider>
-            {children}
-            <CookieConsent />
-          </ToastProvider>
+          <LanguageProvider>
+            <ToastProvider>
+              {children}
+              <CookieConsent />
+            </ToastProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

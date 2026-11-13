@@ -1,0 +1,210 @@
+{
+  "_readme": "Realistic sample values for building screens before the contracts are deployed. Big numbers are strings: wrap them in BigInt() to match what viem returns. USDC has 6 decimals (\"5000000\" = 5 USDC). Energy is in Wh (\"1000\" = 1 kWh). Status: 0 OK, 1 THEFT, 2 TAMPER, 3 OFFLINE. Addresses are made up, except usdc (Circle's test USDC on Base Sepolia) and the meter deviceSigner (the Wokwi ESP32 from issue #4).",
+
+  "network": {
+    "name": "baseSepolia",
+    "chainId": 84532,
+    "explorer": "https://sepolia.basescan.org"
+  },
+
+  "contracts": {
+    "SolarShareToken": "0x5a1e5a1e00000000000000000000000000000001",
+    "MeterOracle": "0x5a1e5a1e00000000000000000000000000000002",
+    "RevenueDistributor": "0x5a1e5a1e00000000000000000000000000000003",
+    "ShareSale": "0x5a1e5a1e00000000000000000000000000000004",
+    "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+  },
+
+  "asset": {
+    "tokenName": "Block A Solar Share",
+    "tokenSymbol": "SSBA",
+    "decimals": 0,
+    "systemSizeKwp": 10,
+    "location": "Block A community mini-grid, South Africa",
+    "maxSupply": "3500",
+    "totalSupply": "2140",
+    "sharesRemaining": "1360",
+    "pricePerShareUsdc": "5000000",
+    "tariffUsdcPerKwh": "200000",
+    "totalDepositedUsdc": "1500000000",
+    "depositCapUsdc": "1620000000",
+    "remainingDepositAllowanceUsdc": "120000000",
+    "totalClaimedUsdc": "1212400000",
+    "treasury": "0xf8fC9ECC8CE2f51Bf0E408b9f1A764C52ef250B8",
+    "paused": false,
+    "documents": [
+      {
+        "name": "SPV_CERTIFICATE",
+        "sha256Hash": "0x9f2b5c1e7a3d48f06b1c2d3e4f5061728394a5b6c7d8e9f0a1b2c3d4e5f60718",
+        "uri": "ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi/spv-certificate.pdf",
+        "updatedAt": "1793836800"
+      },
+      {
+        "name": "INSTALLATION_CERTIFICATE",
+        "sha256Hash": "0x3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f8091a2b",
+        "uri": "ipfs://bafybeihkoviema7g3gxyt6la7vd5ho32ictqbilu3wnlo3rs7ewhnp7lly/coc-electrical.pdf",
+        "updatedAt": "1793836800"
+      },
+      {
+        "name": "POWER_PURCHASE_AGREEMENT",
+        "sha256Hash": "0xa1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90",
+        "uri": "ipfs://bafybeie5gq4jxvzmsym6hjlwxej4rwdoxt7wadqvmmwbqi7r27fclha2va/ppa-block-a.pdf",
+        "updatedAt": "1793923200"
+      }
+    ]
+  },
+
+  "meter": {
+    "ok": {
+      "status": 0,
+      "meterId": 1,
+      "deviceSigner": "0xaa69C29dA92fa7d0Ef717705Cd21Dd6e4D641ff3",
+      "lastSeq": "25921",
+      "lastTimestamp": "1794571200",
+      "totalProducedWh": "9000000",
+      "totalSoldWh": "8100000",
+      "lastPowerW": 6420,
+      "lastGapBps": 925,
+      "theftActive": false,
+      "tamperActive": false,
+      "offline": false,
+      "theftGapBps": 1500,
+      "offlineTimeout": "600"
+    },
+    "theft": {
+      "status": 1,
+      "meterId": 1,
+      "deviceSigner": "0xaa69C29dA92fa7d0Ef717705Cd21Dd6e4D641ff3",
+      "lastSeq": "25922",
+      "lastTimestamp": "1794571260",
+      "totalProducedWh": "9000110",
+      "totalSoldWh": "8100040",
+      "lastPowerW": 6600,
+      "lastGapBps": 6363,
+      "theftActive": true,
+      "tamperActive": false,
+      "offline": false,
+      "theftGapBps": 1500,
+      "offlineTimeout": "600"
+    },
+    "tamper": {
+      "status": 2,
+      "meterId": 1,
+      "deviceSigner": "0xaa69C29dA92fa7d0Ef717705Cd21Dd6e4D641ff3",
+      "lastSeq": "25923",
+      "lastTimestamp": "1794571320",
+      "totalProducedWh": "9000215",
+      "totalSoldWh": "8100135",
+      "lastPowerW": 6300,
+      "lastGapBps": 952,
+      "theftActive": false,
+      "tamperActive": true,
+      "offline": false,
+      "theftGapBps": 1500,
+      "offlineTimeout": "600"
+    },
+    "offline": {
+      "status": 3,
+      "meterId": 1,
+      "deviceSigner": "0xaa69C29dA92fa7d0Ef717705Cd21Dd6e4D641ff3",
+      "lastSeq": "25921",
+      "lastTimestamp": "1794571200",
+      "totalProducedWh": "9000000",
+      "totalSoldWh": "8100000",
+      "lastPowerW": 6420,
+      "lastGapBps": 925,
+      "theftActive": false,
+      "tamperActive": false,
+      "offline": true,
+      "theftGapBps": 1500,
+      "offlineTimeout": "600"
+    }
+  },
+
+  "recentReadings": [
+    { "meterId": 1, "seq": "25919", "timestamp": "1794571080", "energyProducedWh": "8999785", "energySoldWh": "8099805", "powerW": 6380, "tamper": false, "gapBps": 930 },
+    { "meterId": 1, "seq": "25920", "timestamp": "1794571140", "energyProducedWh": "8999892", "energySoldWh": "8099902", "powerW": 6410, "tamper": false, "gapBps": 934 },
+    { "meterId": 1, "seq": "25921", "timestamp": "1794571200", "energyProducedWh": "9000000", "energySoldWh": "8100000", "powerW": 6420, "tamper": false, "gapBps": 925 },
+    { "meterId": 1, "seq": "25922", "timestamp": "1794571260", "energyProducedWh": "9000110", "energySoldWh": "8100040", "powerW": 6600, "tamper": false, "gapBps": 6363 }
+  ],
+
+  "events": {
+    "theftDetected": {
+      "meterId": 1,
+      "seq": "25922",
+      "deltaProducedWh": "110",
+      "deltaSoldWh": "40",
+      "gapBps": 6363,
+      "txHash": "0x7d2c4b9e0f1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4",
+      "blockTimestamp": "1794571266"
+    },
+    "statusChanged": [
+      { "previous": 0, "current": 1, "blockTimestamp": "1794571266" },
+      { "previous": 1, "current": 0, "blockTimestamp": "1794571326" }
+    ],
+    "incomeDeposited": [
+      { "by": "0xf8fC9ECC8CE2f51Bf0E408b9f1A764C52ef250B8", "amount": "260000000", "totalDeposited": "1240000000", "monthLabel": "September 2026", "blockTimestamp": "1791158400" },
+      { "by": "0xf8fC9ECC8CE2f51Bf0E408b9f1A764C52ef250B8", "amount": "260000000", "totalDeposited": "1500000000", "monthLabel": "October 2026", "blockTimestamp": "1793836800" }
+    ],
+    "sharesPurchased": [
+      { "buyer": "0x4e9A1b2C3d4E5f60718293A4b5C6d7E8f9012345", "amount": "40", "cost": "200000000", "blockTimestamp": "1789000000" },
+      { "buyer": "0x7B3c4D5e6F708192a3B4c5D6e7F8091A2b3C4d5E", "amount": "10", "cost": "50000000", "blockTimestamp": "1789100000" }
+    ],
+    "payoutClaimed": [
+      { "account": "0x4e9A1b2C3d4E5f60718293A4b5C6d7E8f9012345", "amount": "2971962", "blockTimestamp": "1793900000" }
+    ]
+  },
+
+  "investors": {
+    "thandi": {
+      "label": "Thandi (approved, 40 shares, can claim)",
+      "account": "0x4e9A1b2C3d4E5f60718293A4b5C6d7E8f9012345",
+      "shares": "40",
+      "ownershipBps": 186,
+      "pendingPayoutUsdc": "4859813",
+      "claimBlocker": 0,
+      "isApproved": true,
+      "isFrozen": false,
+      "usdcBalance": "52971962"
+    },
+    "sipho": {
+      "label": "Sipho (approved, 10 shares, meter in THEFT so claim is blocked)",
+      "account": "0x7B3c4D5e6F708192a3B4c5D6e7F8091A2b3C4d5E",
+      "shares": "10",
+      "ownershipBps": 46,
+      "pendingPayoutUsdc": "1214953",
+      "claimBlocker": 2,
+      "isApproved": true,
+      "isFrozen": false,
+      "usdcBalance": "0"
+    },
+    "newVisitor": {
+      "label": "New visitor (not approved yet, can't buy)",
+      "account": "0x1234567890AbcdEF1234567890aBcdef12345678",
+      "shares": "0",
+      "ownershipBps": 0,
+      "pendingPayoutUsdc": "0",
+      "claimBlocker": 3,
+      "isApproved": false,
+      "isFrozen": false,
+      "usdcBalance": "25000000"
+    },
+    "frozen": {
+      "label": "Frozen wallet (reported lost)",
+      "account": "0x9999888877776666555544443333222211110000",
+      "shares": "25",
+      "ownershipBps": 116,
+      "pendingPayoutUsdc": "3037383",
+      "claimBlocker": 4,
+      "isApproved": true,
+      "isFrozen": true,
+      "usdcBalance": "0"
+    }
+  },
+
+  "buyQuote": {
+    "amount": "20",
+    "costUsdc": "100000000",
+    "steps": ["approve USDC: usdc.approve(ShareSale, 100000000)", "buy: ShareSale.buy(20)"]
+  }
+}

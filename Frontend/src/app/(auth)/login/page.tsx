@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 // reCAPTCHA removed — replaced by Huawei WAF bot protection (Project_Work_Breakdown: Auth0 → IAM with MFA integration)
 import {
@@ -11,6 +11,7 @@ import {
   EyeOff,
   ChevronRight,
   AlertTriangle,
+  Sun,
 } from "lucide-react";
 import Link from "next/link";
 import { apiLogin, apiVerifyCaptcha } from "@/lib/api";
@@ -117,9 +118,11 @@ const HuaweiLogo = () => (
   </svg>
 );
 
-// ── Page ─────────────────────────────────────────────────────────────────────
-export default function LoginPage() {
+// ── Form ─────────────────────────────────────────────────────────────────────
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
   const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -145,9 +148,9 @@ export default function LoginPage() {
 
   // Redirect if already logged in
   useEffect(() => {
-    const token = localStorage.getItem("gridguard_token");
+    const token = localStorage.getItem("solarshare_token");
     if (token) {
-      router.replace("/admin");
+      router.replace("/solar");
     } else {
       setIsChecking(false);
     }
@@ -168,15 +171,15 @@ export default function LoginPage() {
         const res = await apiVerifyCaptcha(
           JSON.stringify({ x: xValue, y: 5.0 }),
           captchaToken,
-          email || "operator@gridguard.co.za"
+          email || "operator@solarshare.co.za"
         );
         if (res) {
           setCaptchaVerified(true);
           setCaptchaError("");
-          showToast("Huawei OneAccess CAPTCHA verified", "success");
+          showToast("Security CAPTCHA verified", "success");
         } else {
           setSliderX(0);
-          setCaptchaError("OneAccess rejected CAPTCHA code coordinates.");
+          setCaptchaError("Verification failed. Please try again.");
           showToast("Verification failed", "error");
         }
       } catch {
@@ -206,22 +209,25 @@ export default function LoginPage() {
     try {
       const result = await apiLogin(email, password);
       if (result) {
-        localStorage.setItem("gridguard_token", result.token);
-        localStorage.setItem("gridguard_user", JSON.stringify(result.user));
+        localStorage.setItem("solarshare_token", result.token);
+        localStorage.setItem("solarshare_user", JSON.stringify(result.user));
+        document.cookie = `solarshare_token=${result.token}; path=/; SameSite=Lax`;
+        document.cookie = `solarshare_user=${encodeURIComponent(JSON.stringify(result.user))}; path=/; SameSite=Lax`;
+        // If ?next= was requested, redirect there
+        if (nextParam && nextParam.startsWith('/')) {
+          router.push(nextParam);
+          return;
+        }
+
         // Route based on user role
         switch (result.user.role) {
-          case "worker":
-            router.push("/worker");
-            break;
-          case "governance":
-            router.push("/governance");
-            break;
-          case "dev":
-            router.push("/dev");
-            break;
+          case "operator":
           case "admin":
+            router.push("/operator");
+            break;
+          case "investor":
           default:
-            router.push("/admin");
+            router.push("/solar");
             break;
         }
       } else {
@@ -264,13 +270,13 @@ export default function LoginPage() {
               Sign in
             </h1>
             <p className="text-sm text-text-secondary">
-              Use single sign-on to access GridGuard.
+              Sign in to access SolarShare.
             </p>
           </div>
 
           <div className="shrink-0 flex items-center gap-2">
-            <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center overflow-hidden">
-              <img src="/Logo.webp" alt="GridGuard" className="w-7 h-7 object-contain" />
+            <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center overflow-hidden">
+              <Sun className="w-6 h-6" />
             </div>
           </div>
         </div>
@@ -284,11 +290,11 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Huawei IAM SSO — sole external auth provider per Project_Work_Breakdown (Auth0 → IAM with MFA) */}
+        {/* Partner SSO */}
         <div className="mt-6 space-y-3">
           <SocialButton
-            label="Continue with Huawei ID"
-            logo={<HuaweiLogo />}
+            label="Continue with Single Sign-On"
+            logo={<Lock className="w-4 h-4 text-gray-700" />}
             onClick={async () => {
               const verifier = [...crypto.getRandomValues(new Uint8Array(32))]
                 .map(b => ("0" + b.toString(16)).slice(-2))
@@ -301,11 +307,11 @@ export default function LoginPage() {
                 .replace(/\+/g, "-")
                 .replace(/\//g, "_")
                 .replace(/=+$/, "");
-              sessionStorage.setItem("gg_pkce_verifier_huawei", verifier);
-              const authUrl = process.env.NEXT_PUBLIC_HUAWEI_AUTH_URL || "https://oauth-login.cloud.huawei.com/oauth2/v3/authorize";
+              sessionStorage.setItem("solarshare_pkce_verifier", verifier);
+              const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || "/login";
               const params = new URLSearchParams({
-                client_id: process.env.NEXT_PUBLIC_HUAWEI_CLIENT_ID || "",
-                redirect_uri: `${window.location.origin}/auth/huawei`,
+                client_id: process.env.NEXT_PUBLIC_AUTH_CLIENT_ID || "",
+                redirect_uri: `${window.location.origin}/auth/callback`,
                 response_type: "code",
                 scope: "openid email profile",
                 code_challenge: challenge,
@@ -394,10 +400,10 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                {/* Huawei OneAccess CAPTCHA Slider Widget */}
+                {/* Security Verification CAPTCHA Slider Widget */}
                 <div className="mt-4 space-y-2 select-none">
                   <div className="flex justify-between items-center text-[10px] font-mono text-text-muted">
-                    <span className="uppercase tracking-widest text-primary font-bold">HUAWEI OneAccess CAPTCHA</span>
+                    <span className="uppercase tracking-widest text-primary font-bold">SECURITY VERIFICATION CAPTCHA</span>
                     {captchaVerified ? (
                       <span className="text-emerald-600 font-bold">✓ VERIFIED</span>
                     ) : (
@@ -514,6 +520,36 @@ export default function LoginPage() {
                   )}
                 </div>
 
+                {/* Quick Demo Fill Buttons */}
+                <div className="pt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail("operator@solarshare.co.za");
+                      setPassword("operator123");
+                      setCaptchaVerified(true);
+                      setCaptchaError("");
+                      showToast("Filled demo operator credentials", "info");
+                    }}
+                    className="flex-1 py-1.5 px-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-lg text-xs font-semibold transition-colors"
+                  >
+                    Demo Operator
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail("investor@solarshare.co.za");
+                      setPassword("investor123");
+                      setCaptchaVerified(true);
+                      setCaptchaError("");
+                      showToast("Filled demo investor credentials", "info");
+                    }}
+                    className="flex-1 py-1.5 px-2 bg-gray-50 hover:bg-gray-100 text-gray-800 border border-gray-200 rounded-lg text-xs font-semibold transition-colors"
+                  >
+                    Demo Investor
+                  </button>
+                </div>
+
                 <motion.button
                   type="submit"
                   disabled={isLoading}
@@ -562,5 +598,19 @@ export default function LoginPage() {
         </p>
       </div>
     </motion.div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="w-8 h-8 rounded-sm bg-primary animate-spin"></div>
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -159,8 +159,10 @@ export default function SignupPage() {
         try {
             const result = await apiSignup(email, password, fullName, captchaToken!);
             if (result) {
-                localStorage.setItem("gridguard_token", result.token);
-                localStorage.setItem("gridguard_user", JSON.stringify(result.user));
+                localStorage.setItem("solarshare_token", result.token);
+                localStorage.setItem("solarshare_user", JSON.stringify(result.user));
+                document.cookie = `solarshare_token=${result.token}; path=/; SameSite=Lax`;
+                document.cookie = `solarshare_user=${encodeURIComponent(JSON.stringify(result.user))}; path=/; SameSite=Lax`;
                 setSubmitted(true);
             } else {
                 showToast("Registration failed. Email might already be in use.", "error");
@@ -221,14 +223,14 @@ export default function SignupPage() {
                 <h1 className="text-3xl font-extrabold tracking-tighter text-white">
                     Create Account
                 </h1>
-                <p className="text-sm text-zinc-500 font-mono">
-                    Register your organisation with GridGuard AI.
+                <p className="text-sm text-zinc-400 font-mono">
+                    Join the SolarShare community co-ownership platform.
                 </p>
             </div>
 
-            {/* Social Auth — Huawei ID only per Project_Work_Breakdown (Auth0 → IAM with MFA integration) */}
+            {/* Social Auth */}
             <div className="flex gap-3">
-                <SocialButton label="Huawei ID" logo={<HuaweiLogo />} />
+                <SocialButton label="Single Sign-On" logo={<Lock className="w-4 h-4 text-white" />} />
             </div>
 
             {/* Divider */}
@@ -311,13 +313,13 @@ export default function SignupPage() {
                     </div>
                 </div>
 
-                {/* Bot protection by Huawei WAF (Project_Work_Breakdown: WAF rate limiting) */}
+                {/* Security verification */}
                 <div className="flex justify-center py-2">
                     <div className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 rounded-lg flex items-center gap-2">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                         </svg>
-                        Protected by Huawei WAF
+                        Protected by SSL Encryption
                     </div>
                 </div>
 

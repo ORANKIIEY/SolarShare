@@ -1,11 +1,11 @@
 /**
- * GridGuard AI — Strict Backend API Client (No Mock Fallbacks)
+ * SolarShare — Strict Backend API Client (No Mock Fallbacks)
  */
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-    const token = typeof window !== "undefined" ? localStorage.getItem("gridguard_token") : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem("solarshare_token") : null;
     const headers: Record<string, string> = {
         "Content-Type": "application/json",
         ...(options?.headers as Record<string, string> || {}),
@@ -134,7 +134,7 @@ export const apiGetNotificationsStrict = () => request<ApiNotification[]>("/api/
 // Export
 export const apiExportAssetsStrict = (format: "csv" | "json") => 
     fetch(`${API_BASE}/api/assets/export?format=${format}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("gridguard_token") || ""}` },
+        headers: { Authorization: `Bearer ${localStorage.getItem("solarshare_token") || ""}` },
     }).then(r => { if (!r.ok) throw new Error("Export failed"); return r.blob(); });
 
 // Health Check
@@ -406,7 +406,7 @@ export const apiImportAssetsStrict = (file: File) => {
     formData.append("file", file);
     return fetch(`${API_BASE}/api/assets/import`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${localStorage.getItem("gridguard_token") || ""}` },
+        headers: { Authorization: `Bearer ${localStorage.getItem("solarshare_token") || ""}` },
         body: formData,
     }).then(r => { if (!r.ok) throw new Error("Import failed"); return r.json(); });
 };
@@ -677,9 +677,6 @@ export const apiGetRolesAdminStrict = () => request("/api/admin/roles");
 // Admin Audit
 export const apiGetAuditLogAdminStrict = () => request("/api/admin/audit");
 
-// Admin Billing
-export const apiGetBillingSettingsAdminStrict = () => request("/api/admin/billing/settings");
-
 // Admin Plans
 export const apiGetPlansAdminStrict = () => request("/api/admin/plans");
 
@@ -786,7 +783,7 @@ export const apiImportDataStrict = (file: File) => {
     formData.append("file", file);
     return fetch(`${API_BASE}/api/admin/import`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${localStorage.getItem("gridguard_token") || ""}` },
+        headers: { Authorization: `Bearer ${localStorage.getItem("solarshare_token") || ""}` },
         body: formData,
     }).then(r => { if (!r.ok) throw new Error("Import failed"); return r.json(); });
 };

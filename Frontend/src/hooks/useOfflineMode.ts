@@ -135,7 +135,7 @@ export function useOfflineMode() {
         
         // Show success notification
         if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('GridGuard Sync Complete', {
+          new Notification('SolarShare Sync Complete', {
             body: 'All offline data has been synchronized with the server',
             icon: '/favicon.ico'
           });

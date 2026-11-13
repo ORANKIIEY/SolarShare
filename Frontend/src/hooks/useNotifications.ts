@@ -86,7 +86,7 @@ export function useNotifications() {
       body: message,
       icon: '/favicon.ico',
       badge: '/favicon.ico',
-      tag: 'gridguard-alert',
+      tag: 'solarshare-alert',
       requireInteraction: false,
       silent: false,
       ...options

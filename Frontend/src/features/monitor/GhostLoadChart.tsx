@@ -86,7 +86,7 @@ export function GhostLoadChart() {
         <div className="flex gap-4">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-danger animate-pulse" />
-            <span className="text-[10px] font-mono text-red-600">Ghost Load (Theft)</span>
+            <span className="text-[10px] font-mono text-red-600">Unmetered Gap (Theft Risk)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-acid" />

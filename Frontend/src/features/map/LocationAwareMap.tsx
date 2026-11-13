@@ -62,7 +62,7 @@ export default function LocationAwareMap({
         className="w-full h-full border-0"
         allowFullScreen
         loading="lazy"
-        title={`GridGuard Map - ${assignedArea?.name || 'South Africa'}`}
+        title={`SolarShare Map - ${assignedArea?.name || 'South Africa'}`}
       />
 
       {/* Simulated Pole Markers */}

@@ -1,80 +1,117 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+/**
+ * SolarShare Edge Route Protection & Middleware Proxy
+ *
+ * NOTE: Cookie-based client role checks like this are demo-grade for prototype demonstration.
+ * Production requires server-verified sessions / cryptographically signed JWTs with tamper-proof claims,
+ * secure httpOnly SameSite=Strict cookies, and server-side RBAC validation against the database or identity provider.
+ */
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  // Public paths that don't require authentication
-  const publicPaths = ['/', '/login', '/blog', '/sectors', '/platform', '/compliance'];
-  
-  // Protected paths and their required roles
-  const protectedPaths = {
-    '/admin': ['admin'],
-    '/worker': ['worker'],
-    '/governance': ['governance'], 
-    '/dev': ['dev']
-  };
 
-  // Check if path is public
-  if (publicPaths.some(path => pathname.startsWith(path))) {
+  // 1. Redirect legacy utility dashboard pages to /solar (#25)
+  const legacyPrefixes = [
+    '/admin',
+    '/worker',
+    '/governance',
+    '/dev',
+    '/sectors',
+    '/platform',
+    '/compliance',
+    '/blog',
+  ];
+
+  if (legacyPrefixes.some(prefix => pathname === prefix || pathname.startsWith(prefix + '/'))) {
+    return NextResponse.redirect(new URL('/solar', request.url));
+  }
+
+  // 2. Check Protected Operator Routes (take priority over public /solar paths)
+  const isOperatorRoute =
+    pathname === '/operator' ||
+    pathname.startsWith('/operator/') ||
+    pathname === '/solar/operator' ||
+    pathname.startsWith('/solar/operator/');
+
+  // Check Public Paths
+  // Match '/' exactly, and for other public paths use exact match or subpath prefix (p + '/')
+  const isExactRoot = pathname === '/';
+  const publicPrefixes = [
+    '/login',
+    '/signup',
+    '/solar',
+  ];
+
+  const isPublic =
+    !isOperatorRoute &&
+    (isExactRoot ||
+      publicPrefixes.some(
+        prefix => pathname === prefix || pathname.startsWith(prefix + '/')
+      ));
+
+  if (isPublic) {
     return NextResponse.next();
   }
 
-  // Get token and user from storage (for client-side requests)
-  const token = request.cookies.get('gridguard_token')?.value;
-  const userCookie = request.cookies.get('gridguard_user')?.value;
-  
+  // 2. Read Authentication Cookies
+  const token = request.cookies.get('solarshare_token')?.value;
+  const userCookie = request.cookies.get('solarshare_user')?.value;
+
   if (!token || !userCookie) {
-    // Redirect to login if not authenticated
-    return NextResponse.redirect(new URL('/login', request.url));
+    // Unauthenticated: redirect to /login with next parameter preserving target destination
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('next', pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   try {
-    const user = JSON.parse(userCookie);
-    const userRole = user.role;
+    const user = JSON.parse(decodeURIComponent(userCookie));
+    const userRole = user.role || 'investor';
 
-    // Check role-based access
-    for (const [path, allowedRoles] of Object.entries(protectedPaths)) {
-      if (pathname.startsWith(path)) {
+    // 3. Protected Routes & Role Authorization
+    // SolarShare Roles:
+    // - 'operator': System operator managing solar assets, revenue deposits, tariffs, and meter statuses
+    // - 'investor': Community co-owner holding shares and receiving payouts
+    // - 'admin' / legacy roles supported for maintenance consoles
+    const protectedRoutes: Record<string, string[]> = {
+      '/operator': ['operator', 'admin'],
+      '/solar/operator': ['operator', 'admin'],
+      '/admin': ['operator', 'admin'],
+      '/worker': ['worker', 'operator', 'admin'],
+      '/governance': ['governance', 'operator', 'admin'],
+      '/dev': ['dev', 'operator', 'admin'],
+    };
+
+    for (const [routePath, allowedRoles] of Object.entries(protectedRoutes)) {
+      if (pathname === routePath || pathname.startsWith(routePath + '/')) {
         if (!allowedRoles.includes(userRole)) {
-          // Redirect to appropriate dashboard based on role
-          let redirectPath = '/admin'; // default
-          switch (userRole) {
-            case 'worker':
-              redirectPath = '/worker';
-              break;
-            case 'governance':
-              redirectPath = '/governance';
-              break;
-            case 'dev':
-              redirectPath = '/dev';
-              break;
-            case 'admin':
-              redirectPath = '/admin';
-              break;
-          }
-          return NextResponse.redirect(new URL(redirectPath, request.url));
+          // Unauthorized role: redirect to safe investor landing page
+          return NextResponse.redirect(new URL('/solar', request.url));
         }
       }
     }
 
     return NextResponse.next();
-  } catch (error) {
-    // Invalid user data, redirect to login
-    return NextResponse.redirect(new URL('/login', request.url));
+  } catch {
+    // Malformed user cookie: clear session and redirect to login
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('next', pathname);
+    return NextResponse.redirect(loginUrl);
   }
 }
 
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
+     * Match all request paths except for:
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
+     * - favicon.ico, images, icons
+     * - public assets
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|webp|gif)).*)',
   ],
 };
