@@ -1,0 +1,9 @@
+# The device's private key. Never commit it.
+secrets.h
+# A pasted single-file copy of the sketch (e.g. with the key inlined)
+*.single.ino
+sketch-with-secrets.ino
+# The Arduino IDE moves a sketch into a folder named after it
+sketch/
+# Checker dependencies
+tools/node_modules/

@@ -1,0 +1,17 @@
+{
+  "name": "solarshare-meter-checker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Listens to the SolarShare meter's MQTT topic and checks each reading's signature.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node check.mjs"
+  },
+  "dependencies": {
+    "mqtt": "5.16.1",
+    "viem": "2.57.11"
+  }
+}
