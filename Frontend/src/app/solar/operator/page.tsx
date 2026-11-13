@@ -36,6 +36,7 @@ import {
 } from "@/lib/chain";
 import { MeterStatus, type MeterState, type Address } from "@/lib/chain-types";
 import sampleData from "@/lib/sample-data.json";
+import TheftAlertBanner from "@/components/solar/TheftAlertBanner";
 
 interface PendingInvestor {
   id: string;
@@ -272,6 +273,9 @@ export default function SolarOperatorPage() {
           </button>
         </div>
       </header>
+
+      {/* ── Real-time Full-Width Theft Alert Banner (#24) ─────────── */}
+      <TheftAlertBanner onStatusChange={(st) => setMeterStatus(st)} />
 
       {/* ── Main Content Container ────────────────────────────────── */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">

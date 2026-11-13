@@ -36,6 +36,7 @@ import {
 } from "@/lib/chain";
 import { MeterStatus, ClaimBlocker, type Address } from "@/lib/chain-types";
 import sampleData from "@/lib/sample-data.json";
+import TheftAlertBanner from "@/components/solar/TheftAlertBanner";
 
 export default function MySharesPage() {
   const [loading, setLoading] = useState(true);
@@ -223,6 +224,9 @@ export default function MySharesPage() {
           </Link>
         </div>
       </header>
+
+      {/* ── Real-time Full-Width Theft Alert Banner (#24) ─────────── */}
+      <TheftAlertBanner onStatusChange={(st) => setMeterStatus(st)} />
 
       {/* ── Main Dashboard ────────────────────────────────────────── */}
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 space-y-6">

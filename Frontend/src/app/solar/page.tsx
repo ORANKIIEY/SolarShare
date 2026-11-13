@@ -42,6 +42,8 @@ import {
 } from "@/lib/chain";
 import { type MeterState, MeterStatus, MAX_SUPPLY } from "@/lib/chain-types";
 import sampleData from "@/lib/sample-data.json";
+import TheftAlertBanner from "@/components/solar/TheftAlertBanner";
+import LiveReadingsFeed from "@/components/solar/LiveReadingsFeed";
 
 // Document verification definition
 interface DocumentItem {
@@ -273,6 +275,9 @@ export default function SolarAssetPage() {
         </div>
       </header>
 
+      {/* ── Real-time Full-Width Theft Alert Banner (#24) ─────────── */}
+      <TheftAlertBanner />
+
       {/* ── Main Asset Container ──────────────────────────────────── */}
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Breadcrumb */}
@@ -436,6 +441,9 @@ export default function SolarAssetPage() {
             </div>
           </div>
         </div>
+
+        {/* ── Live Oracle Readings Feed (#24) ───────────────────────── */}
+        <LiveReadingsFeed />
 
         {/* ── Key Financial Numbers Grid ───────────────────────────── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
