@@ -1,2 +1,6 @@
 # Copies of received meter messages (see src/recorder.ts)
 recordings/
+
+# Sponsor rate-limit ledger (see src/sponsor/limits.ts)
+sponsor-ledger.*.json
+sponsor-ledger.*.json.tmp

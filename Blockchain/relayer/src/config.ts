@@ -9,7 +9,7 @@ export const ENV_PATH = path.join(RELAYER_DIR, ".env");
 
 export type NetworkName = "localhost" | "baseSepolia";
 
-const NETWORKS: Record<NetworkName, { chainId: number; defaultRpc: string }> = {
+export const NETWORKS: Record<NetworkName, { chainId: number; defaultRpc: string }> = {
   localhost: { chainId: 31337, defaultRpc: "http://127.0.0.1:8545" },
   baseSepolia: { chainId: 84532, defaultRpc: "https://sepolia.base.org" },
 };
@@ -39,7 +39,7 @@ export function loadEnvFile(file = ENV_PATH): void {
   if (fs.existsSync(file)) process.loadEnvFile(file);
 }
 
-function optionalKey(env: NodeJS.ProcessEnv, name: string): Hex | undefined {
+export function optionalKey(env: NodeJS.ProcessEnv, name: string): Hex | undefined {
   const value = env[name]?.trim();
   if (!value) return undefined;
   const key = value.startsWith("0x") ? value : `0x${value}`;

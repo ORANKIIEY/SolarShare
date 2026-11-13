@@ -12,8 +12,37 @@ match the real contracts.
 | `sample-data.json` | Realistic sample values, including a THEFT example. |
 | `abi/` | The contract ABIs (the machine-readable list of functions) for viem/wagmi, one JSON file per contract. Import them with `import abi from "./abi/ShareSale.json"`. |
 
-After deployment, `Blockchain/deployments/baseSepolia.json` will hold the real
-contract addresses and ABIs (issue #11).
+After deployment, `Blockchain/deployments/baseSepolia.json` holds the real
+contract addresses and ABIs (issue #11). See "Deployed addresses" below.
+
+## Deployed addresses (`deployments/<network>.json`)
+
+`npm run deploy:baseSepolia` (or `deploy:local`) writes one JSON file per
+network. Read addresses from it instead of copying them into the app:
+
+```jsonc
+{
+  "network": "baseSepolia",
+  "chainId": 84532,
+  "startBlock": 12345678,          // first block with SolarShare: start event queries here
+  "settings": { "pricePerShareUsdc": "5000000", "tariffUsdcPerKwh": "200000",
+                "theftGapBps": 1500, "offlineTimeoutS": 120, "meterDevice": "0xaa69…", ... },
+  "documents": [ { "name": "SPV_CERTIFICATE", "sha256": "0x…", "uri": "https://raw.githubusercontent.com/…" }, ... ],
+  "contracts": {
+    "USDC":               { "address": "0x036C…CF7e", "mock": false, "label": "Circle test USDC …", "abi": [...] },
+    "SolarShareToken":    { "address": "0x…", "explorer": "https://sepolia.basescan.org/address/0x…", "abi": [...] },
+    "MeterOracle":        { ... },
+    "RevenueDistributor": { ... },
+    "ShareSale":          { ... }
+  }
+}
+```
+
+- `contracts.USDC` is always the USDC to use. On Base Sepolia it is Circle's
+  test USDC (`mock: false`). On a local chain it is `MockUSDC`, a FAKE token
+  anyone can mint (`mock: true`): when `mock` is true, label it "test USDC
+  (fake)" in the UI.
+- The ABIs are the same as in `abi/`.
 
 ## The four contracts in one paragraph each
 
@@ -51,7 +80,7 @@ viem returns large integers as `bigint`, small ones (`uint8`, `uint32`) as `numb
 | 0 | **OK** | All good. Payouts can be claimed. | — |
 | 1 | **THEFT** | Less than 85% of the energy produced was paid for in the last reading. Someone may be taking power. | Clears **by itself** on the next normal reading. |
 | 2 | **TAMPER** | The meter says its case was opened. | An **admin** clears it after an inspection. |
-| 3 | **OFFLINE** | No reading for more than `offlineTimeout` seconds (600 s normally, shorter for the demo). Also the status before the first reading. | Clears with the next good reading. |
+| 3 | **OFFLINE** | No reading for more than `offlineTimeout` seconds (600 s normally; the demo deploy sets 120 s). Also the status before the first reading. | Clears with the next good reading. |
 
 If more than one applies, the status shows the first in this order: TAMPER,
 THEFT, OFFLINE. `getMeterState()` also returns each flag on its own
@@ -81,9 +110,11 @@ What the solar asset is, how much is sold, and proof it's real.
 | MeterOracle | `getMeterState()` | status, totals, power, flags (see `MeterState` in `types.ts`) |
 
 **Documents.** The three names are `SPV_CERTIFICATE`,
-`INSTALLATION_CERTIFICATE` and `POWER_PURCHASE_AGREEMENT`. Show the IPFS link
-and the SHA-256 hash. A visitor can download the file, hash it with SHA-256 and
-check it matches: that proves the document wasn't swapped.
+`INSTALLATION_CERTIFICATE` and `POWER_PURCHASE_AGREEMENT`. They are SAMPLE
+PDFs (every page says "SAMPLE: NOT A REAL DOCUMENT") in
+[`docs/asset-documents/`](../../docs/asset-documents/). Show each document's
+title, a download link (`uri`) and the SHA-256 hash, plus a **Verify** button.
+See "Verify a document" below.
 
 **Events for an activity feed:** `ReadingAccepted`, `IncomeDeposited`,
 `SharesPurchased`.
@@ -120,6 +151,130 @@ check it matches: that proves the document wasn't swapped.
 | `ZeroAmount()` | "Enter at least 1 share." |
 | `EnforcedPause()` | "Sales are paused." |
 | `ERC20InsufficientAllowance` / `ERC20InsufficientBalance` | "Approve USDC first" / "Not enough USDC." |
+
+## Verify a document (asset page, #20)
+
+The contract stores each document's **SHA-256 hash**: a 32-byte fingerprint of
+the file. Change one byte of the PDF and the fingerprint is completely
+different. So "Verify" means: download the file, fingerprint it in the browser,
+and compare with the fingerprint on the blockchain. If they match, the file is
+exactly the one the operator registered.
+
+```ts
+import { createPublicClient, http } from "viem";
+import { baseSepolia } from "viem/chains";
+import tokenAbi from "./abi/SolarShareToken.json";
+
+const client = createPublicClient({ chain: baseSepolia, transport: http() });
+
+async function verifyDocument(token: `0x${string}`, name: string) {
+  // 1. The hash and link stored onchain.
+  const doc = (await client.readContract({
+    address: token, abi: tokenAbi, functionName: "getDocument", args: [name],
+  })) as { name: string; sha256Hash: `0x${string}`; uri: string; updatedAt: bigint };
+
+  // 2. Download the file and hash it in the browser (built in, no library).
+  const bytes = await (await fetch(doc.uri)).arrayBuffer();
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  const fileHash = "0x" + Array.from(digest, (b) => b.toString(16).padStart(2, "0")).join("");
+
+  // 3. Compare (both lowercase hex).
+  return { match: fileHash === doc.sha256Hash.toLowerCase(), fileHash, onchainHash: doc.sha256Hash };
+}
+```
+
+- Show "✓ Matches the hash on Base Sepolia" or "✗ Does not match: this file
+  was changed". Show both hashes, and link the token on Basescan (Read
+  Contract → `getDocument`) so anyone can check the onchain side themselves.
+- `getDocuments()` returns all three at once if you'd rather loop.
+- `crypto.subtle` only works on `https://` pages and `localhost`.
+- For now the links are the GitHub raw files on `main`
+  (`https://raw.githubusercontent.com/ORANKIIEY/SolarShare/main/docs/asset-documents/…`).
+  GitHub serves them with cross-origin access allowed, so `fetch` works from
+  the browser. They only work once `docs/asset-documents/` is merged to `main`.
+- **Production** would pin each file to IPFS instead: an `ipfs://` link is
+  derived from the file's content, so it can never quietly point at a
+  different file. A GitHub link can change; the hash check is what catches it.
+- Nice extra: "Verify a file I have". Let the user pick a local PDF
+  (`<input type="file">`, then `await file.arrayBuffer()`) and run steps 2-3.
+
+## Sponsored fees (#16): hide gas from investors
+
+**Demo shortcut, testnet only.** Every blockchain transaction costs a small
+"gas" fee in ETH. A new investor has no ETH, and asking them to get some would
+break the "familiar steps" story. So a small **sponsor** service sends a little
+Base Sepolia ETH (and some test USDC to buy with) to a wallet once it is
+approved. The investor never sees a faucet or a gas prompt.
+
+> In **production** this would be a smart wallet (ERC-4337 account
+> abstraction) with a **paymaster**: the paymaster pays the gas inside the
+> investor's own transaction, so no ETH is ever sent around.
+
+The sponsor runs next to the relayer: `npm run sponsor` in `Blockchain/`
+(settings in `relayer/.env`, see `relayer/README.md`). Default address:
+`http://127.0.0.1:8787`. CORS is on, so the app can call it from the browser.
+
+### `POST /sponsor`
+
+```http
+POST /sponsor
+Content-Type: application/json
+
+{ "address": "0xInvestorWallet" }
+```
+
+It only sends to wallets that are **approved** on SolarShareToken
+(`isApproved(wallet)` is true) and not frozen. It tops the wallet **up to**
+0.0005 ETH and 25 test USDC (5 shares' worth), sending only what's missing.
+It answers once the transfers are in a block (about 2-5 s on Base Sepolia).
+
+**200: done** (also when the wallet already had enough: `alreadyFunded: true`)
+
+```json
+{
+  "ok": true,
+  "address": "0xInvestorWallet",
+  "alreadyFunded": false,
+  "eth":  { "amount": "0.0005", "txHash": "0x…", "explorer": "https://sepolia.basescan.org/tx/0x…" },
+  "usdc": { "amount": "25", "txHash": "0x…", "explorer": "https://sepolia.basescan.org/tx/0x…" }
+}
+```
+
+If the USDC part can't be sent (budget used up, sponsor out of USDC) the ETH
+still goes out and `usdc` is `{ "amount": "0", "skipped": "<reason>" }`.
+
+**Errors** always look like `{ "ok": false, "error": "CODE", "message": "…" }`:
+
+| HTTP | `error` | Meaning | What the app should do |
+| --- | --- | --- | --- |
+| 400 | `BAD_REQUEST` | No or bad `address` | Bug in the app. |
+| 403 | `NOT_APPROVED` | Wallet not approved yet | Show "Waiting for approval". Call again after `WalletApproved`. |
+| 403 | `FROZEN` | Wallet is frozen | Show "Contact the operator". |
+| 429 | `WALLET_LIMIT` | This wallet was already topped up (once per 24 h by default) | Carry on: it should already have gas. `retryAfterS` says when it may ask again. |
+| 429 | `BUSY` | Too many top-ups this hour, all wallets together | Retry after `retryAfterS` (also in the `Retry-After` header). |
+| 503 | `BUDGET_SPENT` | The sponsor's total ETH budget is used up | Show "Demo budget used up". |
+| 503 | `SPONSOR_EMPTY` | The sponsor wallet is out of test ETH | Tell the operator. |
+| 502 | `SEND_FAILED` | Chain unreachable or the transfer failed | Retry in a few seconds. Nothing was recorded. |
+
+### `GET /health`
+
+The sponsor's address, balances, top-up amounts, limits and how much it has
+given away so far. Handy for an admin screen.
+
+### Where it fits in the buy flow (#21)
+
+1. Investor connects a wallet. `isApproved(wallet)` is false: show "Waiting
+   for approval".
+2. The KYC officer calls `approveWallet(wallet)` (Screen 4).
+3. The app sees `WalletApproved(wallet)` (or polls `isApproved`) and calls
+   `POST /sponsor {address: wallet}`. Show "Setting up your account…" while
+   it waits.
+4. On `ok: true`, go on to the two buy transactions (Screen 2). The wallet
+   now has gas money, so the investor only confirms; they never needed ETH of
+   their own.
+
+Calling `/sponsor` on every visit is fine: an already-funded wallet gets
+`alreadyFunded: true` and nothing is sent.
 
 ## Screen 3: My shares
 
@@ -172,7 +327,7 @@ Only wallets with the right **role** can do these. Check with
 | Admin | MeterOracle | `clearTamper()` | Clear TAMPER after an inspection. |
 | Admin | MeterOracle | `setDevice(meterId, deviceAddress)` | Register or replace the meter. |
 | Operator (`OPERATOR_ROLE`) | MeterOracle | `setTheftGapBps(bps)` | THEFT threshold (default 1500 = 15%). |
-| Operator | MeterOracle | `setOfflineTimeout(seconds)` | OFFLINE after this long without a reading (default 600). |
+| Operator | MeterOracle | `setOfflineTimeout(seconds)` | OFFLINE after this long without a reading (contract default 600; the demo deploy sets 120). |
 | Admin | ShareSale | `setPrice(usdc)`, `setTreasury(addr)`, `pause()`, `unpause()` | Sale settings. |
 
 **Events for an admin log:** `WalletApproved`, `WalletRevoked`, `WalletFrozen`,
