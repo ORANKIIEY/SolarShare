@@ -96,7 +96,13 @@ You don't need a Wokwi account.
      `[resume] …` (about 6 seconds), `[mqtt] connected to test.mosquitto.org:1883`;
    - a `[now]` line every 5 seconds with the live power numbers;
    - a `[reading]` block every 30 seconds, followed by `[mqtt] sent seq …`.
-7. **Don't click Save or Share while `secrets.h` is in the project.** Saved
+7. **Keep the Wokwi tab visible during a demo.** Wokwi pauses the simulation
+   while its browser tab is hidden (another tab in front, or the window
+   minimised). While paused, the meter sends nothing, so after 2 minutes the
+   web app shows the meter as **offline**. That part is honest: the meter
+   really was silent. Put the Wokwi tab in its own window if you need to show
+   the web app at the same time.
+8. **Don't click Save or Share while `secrets.h` is in the project.** Saved
    Wokwi projects can be public. If you want to save it, delete `secrets.h`
    first.
 
@@ -121,6 +127,38 @@ Click a part in the circuit to use it while the simulation runs.
   down. Wokwi has no lasting memory, so the meter saves its last signed
   reading on the MQTT broker and reads it back at boot. See
   [MESSAGE_FORMAT.md](MESSAGE_FORMAT.md#saved-state-retained-message).
+
+### The clock after a pause
+
+The meter gets the real time from the internet (NTP) at boot and then counts
+on its own clock. A pause in Wokwi also stops that clock, so it falls behind.
+Even without a pause, Wokwi often runs slower than real time (the speed, for
+example `67%`, shows above the serial monitor), so the clock loses a few
+seconds every half minute.
+
+To fix that, the meter asks an NTP server for the time again just before
+every reading (one small message, usually answered in under half a second).
+If its clock is off by a second or more, it corrects it and prints a line
+such as:
+
+```
+[time] clock was 4.8 s behind real time (Wokwi runs slower than real time), corrected to 2026-11-13 20:29:20 UTC
+[time] clock was 1040.2 s behind real time (was the simulation paused?), corrected to 2026-11-13 21:05:12 UTC
+```
+
+A short `[time]` line before every reading is normal on a slow simulation.
+
+So the first reading after a pause already carries the right time, and the
+web app goes back to online (and green, if there's no theft) as soon as that
+reading reaches the contract. Without this, every reading after a pause had
+an old time, so the contract kept calling the meter offline. While the
+network switch is OFF, the meter skips the check (it has no internet) and
+keeps counting on its own clock.
+
+To see it work: start the simulation, wait for a `[reading]`, click Wokwi's
+**pause** button (⏸, next to stop) for a couple of minutes, then resume. The
+next `[reading]` shows a `[time] clock was … behind` line just before it, and
+its `at …` time matches your laptop's clock (in UTC).
 
 ## Check the readings on your laptop
 

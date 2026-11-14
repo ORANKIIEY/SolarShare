@@ -12,7 +12,9 @@
  *        energy produced (Wh) and energy sold (Wh).
  *        sold = produced - about 7% normal losses - stolen power
  *   3. Every 30 seconds builds a MeterReading with the real time (from NTP)
- *      and a sequence number that only goes up.
+ *      and a sequence number that only goes up. Just before each reading it
+ *      checks the clock against NTP again and fixes it, because Wokwi stops
+ *      the ESP32's clock whenever the simulation pauses.
  *   4. Signs it with EIP-712 (Keccak-256 + secp256k1), the same code as the
  *      spike in Hardware/wokwi-spike, so the MeterOracle contract can check it.
  *   5. Publishes it as JSON over MQTT. If the network is down, readings wait in
@@ -27,7 +29,9 @@
 #include <Arduino.h>
 #include <PubSubClient.h>
 #include <WiFi.h>
+#include <WiFiUdp.h>
 #include <string.h>
+#include <sys/time.h>
 #include <time.h>
 #include <uECC.h>
 
@@ -530,12 +534,21 @@ static unsigned gapPercent(uint64_t produced, uint64_t sold) {
   return (unsigned)(((produced - sold) * 100 + produced / 2) / produced);
 }
 
+static void resyncClock();       // in the Network section below
+static uint64_t g_lastTimestamp = 0;  // timestamp of the last reading we signed
+
 static void makeReading() {
+  resyncClock();  // make sure the timestamp is the real time, even after a pause
+  uint64_t now = (uint64_t)time(nullptr);
+  // Never go back in time: MeterOracle refuses a reading older than the last one.
+  if (now < g_lastTimestamp) now = g_lastTimestamp;
+  g_lastTimestamp = now;
+
   SignedReading sr;
   MeterReading &r = sr.reading;
   r.meterId = METER_ID;
   r.seq = g_nextSeq++;
-  r.timestamp = (uint64_t)time(nullptr);
+  r.timestamp = now;
   r.energyProducedWh = g_producedWms / MS_PER_HOUR;
   r.energySoldWh = g_soldWms / MS_PER_HOUR;
   r.powerW = g_producedW;
@@ -605,6 +618,133 @@ static void syncTime() {
   char when[32];
   formatUtc((uint64_t)time(nullptr), when);
   Serial.printf(" %s\n", when);
+}
+
+// --- Keeping the clock right --------------------------------------------------
+// syncTime() asks NTP for the time once, at boot. After that the ESP32 counts
+// on its own clock. In Wokwi that clock stops whenever the simulation pauses
+// (for example while the browser tab is hidden), so after a pause every reading
+// would carry a time from the past, and MeterOracle would call the meter
+// OFFLINE (or refuse the reading as too old).
+//
+// So before each reading we ask an NTP server again: one small UDP packet,
+// waiting at most NTP_TIMEOUT_MS for the answer. If our clock is off by a
+// second or more, we set it to the real time and print a [time] line.
+static const char *NTP_SERVERS[3] = {"time.google.com", "time.cloudflare.com", "pool.ntp.org"};
+static const uint16_t NTP_LOCAL_PORT = 4123;
+static const uint32_t NTP_TIMEOUT_MS = 1000;
+static const int64_t CLOCK_FIX_THRESHOLD_MS = 1000;     // timestamps are whole seconds
+static const uint64_t NTP_TO_UNIX_SECONDS = 2208988800ULL;  // 1900-01-01 to 1970-01-01
+static WiFiUDP g_ntpUdp;
+static bool g_ntpUdpReady = false;
+static int g_ntpServer = 0;
+static bool g_ntpFailing = false;
+
+static int64_t clockNowMs() {
+  struct timeval tv;
+  gettimeofday(&tv, nullptr);
+  return (int64_t)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
+
+static void setClockMs(int64_t unixMs) {
+  struct timeval tv;
+  tv.tv_sec = (time_t)(unixMs / 1000);
+  tv.tv_usec = (suseconds_t)((unixMs % 1000) * 1000);
+  settimeofday(&tv, nullptr);
+}
+
+static uint32_t readBe32(const uint8_t *p) {
+  return ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16) | ((uint32_t)p[2] << 8) | p[3];
+}
+
+static void drainNtpSocket() {
+  while (g_ntpUdp.parsePacket() > 0) {
+    while (g_ntpUdp.read() >= 0) {
+    }
+  }
+}
+
+// Asks one NTP server for the time. On success, *offsetMs is how far the real
+// time is ahead of our clock (negative if our clock is ahead).
+static bool queryNtp(const char *host, int64_t *offsetMs) {
+  IPAddress ip;
+  if (!WiFi.hostByName(host, ip)) return false;
+
+  uint8_t pkt[48] = {0};
+  pkt[0] = 0x23;  // NTP version 4, "client" mode
+  // A random tag in the transmit field. The server copies it back, so we can
+  // tell its answer apart from a late answer to an earlier question.
+  uint32_t tagHi = esp_random(), tagLo = esp_random();
+  for (int i = 0; i < 4; i++) {
+    pkt[40 + i] = (uint8_t)(tagHi >> (24 - 8 * i));
+    pkt[44 + i] = (uint8_t)(tagLo >> (24 - 8 * i));
+  }
+
+  drainNtpSocket();
+  if (!g_ntpUdp.beginPacket(ip, 123)) return false;
+  g_ntpUdp.write(pkt, sizeof(pkt));
+  if (!g_ntpUdp.endPacket()) return false;
+  uint32_t sentMs = millis();
+
+  while (millis() - sentMs < NTP_TIMEOUT_MS) {
+    if (g_ntpUdp.parsePacket() >= 48) {
+      uint8_t in[48];
+      int n = g_ntpUdp.read(in, sizeof(in));
+      while (g_ntpUdp.read() >= 0) {  // drop anything beyond the 48 bytes
+      }
+      if (n != 48 || g_ntpUdp.remoteIP() != ip) continue;
+      if ((in[0] & 0x07) != 4 || in[1] == 0) continue;  // not a server reply, or "go away"
+      if (readBe32(in + 24) != tagHi || readBe32(in + 28) != tagLo) continue;
+      uint32_t roundTripMs = millis() - sentMs;
+      int64_t localMs = clockNowMs();
+      uint32_t ntpSeconds = readBe32(in + 40);
+      uint32_t ntpFraction = readBe32(in + 44);
+      if (ntpSeconds < NTP_TO_UNIX_SECONDS) continue;
+      int64_t realMs = (int64_t)(ntpSeconds - NTP_TO_UNIX_SECONDS) * 1000 +
+                       (int64_t)(((uint64_t)ntpFraction * 1000) >> 32) + roundTripMs / 2;
+      if (realMs < 1700000000LL * 1000) continue;  // nonsense, ignore it
+      *offsetMs = realMs - localMs;
+      return true;
+    }
+    delay(5);
+  }
+  return false;
+}
+
+static void resyncClock() {
+  // With the network switch OFF the meter has no internet, so it keeps
+  // counting on its own clock, like a real meter would.
+  if (g_networkCut || WiFi.status() != WL_CONNECTED) return;
+  if (!g_ntpUdpReady) g_ntpUdpReady = g_ntpUdp.begin(NTP_LOCAL_PORT) == 1;
+  if (!g_ntpUdpReady) return;
+
+  int64_t offsetMs = 0;
+  bool ok = false;
+  for (int attempt = 0; attempt < 2 && !ok; attempt++) {
+    ok = queryNtp(NTP_SERVERS[g_ntpServer], &offsetMs);
+    if (!ok) g_ntpServer = (g_ntpServer + 1) % 3;  // try the next server
+  }
+  if (!ok) {
+    if (!g_ntpFailing) Serial.println("[time] no answer from NTP, keeping the meter's own clock for now");
+    g_ntpFailing = true;
+    return;
+  }
+  if (g_ntpFailing) Serial.println("[time] NTP answering again");
+  g_ntpFailing = false;
+
+  int64_t absMs = offsetMs < 0 ? -offsetMs : offsetMs;
+  if (absMs < CLOCK_FIX_THRESHOLD_MS) return;  // close enough
+  setClockMs(clockNowMs() + offsetMs);
+  char when[32];
+  formatUtc((uint64_t)time(nullptr), when);
+  // Small gaps are normal: Wokwi often runs slower than real time, so the
+  // clock loses a few seconds between readings. Big gaps mean a pause.
+  const char *why = offsetMs < 0         ? ""
+                    : absMs >= 30000     ? " (was the simulation paused?)"
+                                         : " (Wokwi runs slower than real time)";
+  Serial.printf("[time] clock was %ld.%01d s %s real time%s, corrected to %s\n",
+                (long)(absMs / 1000), (int)((absMs % 1000) / 100),
+                offsetMs > 0 ? "behind" : "ahead of", why, when);
 }
 
 // --- Resume after a restart -------------------------------------------------
