@@ -431,11 +431,25 @@ const en = {
 
     live: {
       title: "Live meter",
-      subtitle: "For the big screen. This page follows the meter as it happens and checks every 3 seconds.",
+      subtitle: "For the big screen. This page follows the meter live: what it sees right now, and the signed proof on the blockchain (checked every 2 seconds).",
       feed: "Signed readings",
       checked: (s: string) => `Checked ${s}`,
       fullscreen: "Full screen",
       exitFullscreen: "Exit full screen",
+      preTheft: (gap: string) => `Meter sees possible theft · ${gap} unpaid right now · checking the signed reading`,
+      preTamper: "Meter case opened · checking the signed reading",
+      preSub: (s: string) => `Payouts stay on until a signed reading confirms it. Next one in about ${s} s.`,
+      recovering: (s: string) =>
+        `The meter sees normal sales again. Payouts resume with the next signed reading, in about ${s} s.`,
+      liveOnly: "The meter is sending live data. Waiting for its next signed reading.",
+      rightNow: "Right now, live from the meter",
+      previewNote: "Live preview: not signed and not used for payouts. Payouts follow the signed readings.",
+      sun: "Sun",
+      stolen: "Stolen",
+      sold: "Sold",
+      unpaidNow: "Unpaid right now",
+      noLive: "No live data from the meter yet",
+      nextSigned: (s: string) => `Next signed reading in about ${s} s`,
     },
   },
 };

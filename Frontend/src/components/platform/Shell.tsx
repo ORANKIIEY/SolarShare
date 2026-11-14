@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Activity, House, LayoutGrid, Settings2, ShoppingBag, Wallet2 } from "lucide-react";
 import { AccountProvider, useAccount } from "@/components/chain/Account";
 import { ChainDataProvider, useChainData } from "@/components/chain/ChainData";
+import { LiveFeedProvider } from "@/components/chain/LiveFeed";
 import { LogoMark } from "@/components/landing/Nav";
 import { DARK_PILL, KV } from "@/components/ui";
 import { LanguageToggle, useLang } from "@/i18n/LanguageProvider";
@@ -248,10 +249,12 @@ function Frame({ children }: { children: React.ReactNode }) {
 
 export default function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <ChainDataProvider meterPollMs={3_000}>
-      <AccountProvider>
-        <Frame>{children}</Frame>
-      </AccountProvider>
+    <ChainDataProvider meterPollMs={2_000}>
+      <LiveFeedProvider>
+        <AccountProvider>
+          <Frame>{children}</Frame>
+        </AccountProvider>
+      </LiveFeedProvider>
     </ChainDataProvider>
   );
 }

@@ -431,11 +431,25 @@ const zu: Dict = {
 
     live: {
       title: "Imitha ebukhoma",
-      subtitle: "Okwesikrini esikhulu. Leli khasi lilandela imitha njengoba kwenzeka futhi lihlola njalo emizuzwini emi-3.",
+      subtitle: "Okwesikrini esikhulu. Leli khasi lilandela imitha bukhoma: lokho ekubonayo manje, nobufakazi obusayiniwe ku-blockchain (kuhlolwa njalo emizuzwini emi-2).",
       feed: "Ukufunda okusayiniwe",
       checked: (s: string) => `Kuhlolwe ${s}`,
       fullscreen: "Isikrini esigcwele",
       exitFullscreen: "Phuma esikrinini esigcwele",
+      preTheft: (gap: string) => `Imitha ibona ukwebiwa okungenzeka · u-${gap} akakhokhelwa manje · sihlola ukufunda okusayiniwe`,
+      preTamper: "Ibhokisi lemitha livuliwe · sihlola ukufunda okusayiniwe",
+      preSub: (s: string) => `Izinkokhelo ziyaqhubeka kuze kube yilapho ukufunda okusayiniwe kukuqinisekisa. Okulandelayo emizuzwini engaba ngu-${s}.`,
+      recovering: (s: string) =>
+        `Imitha ibona ukuthengiswa okujwayelekile futhi. Izinkokhelo ziqala futhi ngokufunda okusayiniwe okulandelayo, emizuzwini engaba ngu-${s}.`,
+      liveOnly: "Imitha ithumela imininingwane ebukhoma. Silinde ukufunda kwayo okusayiniwe okulandelayo.",
+      rightNow: "Manje, bukhoma kusuka emitheni",
+      previewNote: "Ukubuka kuqala okubukhoma: akusayiniwe futhi akusetshenziselwa izinkokhelo. Izinkokhelo zilandela ukufunda okusayiniwe.",
+      sun: "Ilanga",
+      stolen: "Okwebiwe",
+      sold: "Okuthengisiwe",
+      unpaidNow: "Okungakhokhelwa manje",
+      noLive: "Akukabi khona imininingwane ebukhoma evela emitheni",
+      nextSigned: (s: string) => `Ukufunda okusayiniwe okulandelayo emizuzwini engaba ngu-${s}`,
     },
   },
 };
