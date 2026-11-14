@@ -1,36 +1,27 @@
-import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
-import { ToastProvider } from "@/components/ui/Toast";
-import CookieConsent from "@/components/CookieConsent";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import { LanguageProvider } from "@/i18n/LanguageProvider";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "GridGuard AI | Mission Control",
-  description: "Real-time municipal energy theft detection system.",
-  icons: {
-    icon: "/favicon.ico?v=2",
-  },
+  title: "SolarShare | Own a share of your neighbourhood's solar",
+  description:
+    "Neighbours co-own a community solar mini-grid and get paid every month, only for power a tamper-checked meter has proven was sold. Demo on a test network: no real money.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#f2f2f2",
+};
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
-      <body className="font-sans bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white transition-colors duration-300">
-        <ThemeProvider>
-          <ToastProvider>
-            {children}
-            <CookieConsent />
-          </ToastProvider>
-        </ThemeProvider>
+    <html lang="en" className={inter.variable}>
+      <body className="font-sans min-h-screen overflow-x-hidden">
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
   );

@@ -131,6 +131,41 @@ signature** for the current contract, and continues from those totals.
   reject the readings as "energy going down" until it is reset or redeployed.
   A real meter keeps its totals in flash, so this only affects the simulation.
 
+## Live preview (unsigned)
+
+Every 2 seconds the meter also publishes what its dials say **right now** on
+`solarshare/meter/{meterId}/live` (not retained):
+
+```json
+{"meterId":1,"t":1794640702,"producedW":5006,"stolenW":2000,"soldW":2656,
+ "gapPct":47,"theft":true,"tamper":false,"nextReadingS":14,"queued":0}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `t` | meter clock, Unix seconds |
+| `producedW`, `stolenW`, `soldW` | power right now, watts |
+| `gapPct` | how far sold is behind produced right now (includes the ~7% normal losses) |
+| `theft`, `tamper` | what the meter's own check says right now |
+| `nextReadingS` | seconds until the next signed reading |
+
+It is **not signed** and anyone can publish on a public broker, so it must
+never decide payouts. The web app shows it as an early warning ("meter sees
+possible theft, checking the signed reading"); payout status always comes from
+the signed readings on `.../reading` via the relayer and MeterOracle. The
+relayer ignores `.../live`.
+
+## Quick readings when theft starts or stops
+
+Readings normally go out every 30 s. When the meter's own check flips (theft
+or tamper starts or stops, and stays that way for 1 s), it closes the current
+reading as soon as it covers at least 20 Wh of production (about 14 s at 5 kW,
+never under 10 s), then sends a clean reading of the new state one such window
+later. So the oracle sees the change within roughly 15–30 s instead of up to a
+minute, and recovery never waits on a reading that still mixes in stolen power.
+The 20 Wh floor matters: energy is counted in whole Wh, and over a very short
+window a 1 Wh rounding step alone could look like a 15% gap.
+
 ## Sequence numbers across restarts
 
 On boot, `seq` starts at the current Unix time, or one past the saved state's

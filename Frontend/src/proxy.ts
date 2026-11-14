@@ -1,80 +1,28 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+// Route protection (#18). Everything is public except the operator area.
+// Paths are matched exactly or by "prefix + /", never with a bare
+// startsWith("/"), which would match every page.
+import { NextResponse, type NextRequest } from "next/server";
+import { SESSION_COOKIE, verifySession } from "@/lib/server/auth";
 
-export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  
-  // Public paths that don't require authentication
-  const publicPaths = ['/', '/login', '/blog', '/sectors', '/platform', '/compliance'];
-  
-  // Protected paths and their required roles
-  const protectedPaths = {
-    '/admin': ['admin'],
-    '/worker': ['worker'],
-    '/governance': ['governance'], 
-    '/dev': ['dev']
-  };
+const OPEN = new Set(["/solar/operator/login", "/api/operator/login"]);
 
-  // Check if path is public
-  if (publicPaths.some(path => pathname.startsWith(path))) {
-    return NextResponse.next();
+const under = (path: string, base: string) => path === base || path.startsWith(`${base}/`);
+
+export async function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  const guarded = under(pathname, "/solar/operator") || under(pathname, "/api/operator");
+  if (!guarded || OPEN.has(pathname)) return NextResponse.next();
+
+  if (await verifySession(req.cookies.get(SESSION_COOKIE)?.value)) return NextResponse.next();
+
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json({ ok: false, error: "SIGNED_OUT" }, { status: 401 });
   }
-
-  // Get token and user from storage (for client-side requests)
-  const token = request.cookies.get('gridguard_token')?.value;
-  const userCookie = request.cookies.get('gridguard_user')?.value;
-  
-  if (!token || !userCookie) {
-    // Redirect to login if not authenticated
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-
-  try {
-    const user = JSON.parse(userCookie);
-    const userRole = user.role;
-
-    // Check role-based access
-    for (const [path, allowedRoles] of Object.entries(protectedPaths)) {
-      if (pathname.startsWith(path)) {
-        if (!allowedRoles.includes(userRole)) {
-          // Redirect to appropriate dashboard based on role
-          let redirectPath = '/admin'; // default
-          switch (userRole) {
-            case 'worker':
-              redirectPath = '/worker';
-              break;
-            case 'governance':
-              redirectPath = '/governance';
-              break;
-            case 'dev':
-              redirectPath = '/dev';
-              break;
-            case 'admin':
-              redirectPath = '/admin';
-              break;
-          }
-          return NextResponse.redirect(new URL(redirectPath, request.url));
-        }
-      }
-    }
-
-    return NextResponse.next();
-  } catch (error) {
-    // Invalid user data, redirect to login
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
+  const login = new URL("/solar/operator/login", req.url);
+  login.searchParams.set("next", pathname);
+  return NextResponse.redirect(login);
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
-  ],
+  matcher: ["/solar/operator/:path*", "/api/operator/:path*"],
 };

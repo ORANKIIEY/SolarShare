@@ -1,159 +1,153 @@
-@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@100..700&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* AWWWARDS WHITE THEME - Premium Agency Style */
-  --color-primary: #dc2626;
-  --color-primary-dark: #991b1b;
-  --color-primary-light: #ef4444;
-  --color-white: #ffffff;
-  --color-cream: #fafafa;
-  --color-light: #f5f5f5;
-  --color-black: #0a0a0a;
-  --color-text: #171717;
-  --color-text-secondary: #525252;
-  --color-text-muted: #737373;
-  --color-border: #e5e5e5;
-  --color-border-dark: #d4d4d4;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  
-  /* Fonts */
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-display: "Antonio", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --color-paper: #f2f2f2;
+  --color-paper-2: #f7f7f7;
+  --color-ink: #0a0a0a;
 
-  /* Animations */
-  --animate-marquee: marquee 30s linear infinite;
-  --animate-marquee-reverse: marquee-reverse 30s linear infinite;
-  --animate-float: float 6s ease-in-out infinite;
-  
-  @keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+  /* Platform (dark dashboard) */
+  --color-d-main: #0f0f10;
+  --color-d-side: #0b0b0c;
+  --color-d-panel: #111113;
+  --color-d-hover: #1f1f21;
+  --color-d-active: #202022;
+  --color-d-input: #161618;
+  --color-d-line: #222224;
+  --color-d-line-2: #2e2e30;
+  --color-d-text: #e4e4e6;
+}
+
+.platform {
+  background: var(--color-d-main);
+  color: var(--color-d-text);
+  color-scheme: dark;
+}
+.platform ::selection {
+  background: #3f3f46;
+  color: #fff;
+}
+.platform ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.platform ::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+body {
+  background: var(--color-paper);
+  color: #09090b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: #000;
+  color: #fff;
+}
+
+/* Clear keyboard focus everywhere, on light and dark backgrounds. */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* Small uppercase label used across sections. */
+.eyebrow {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* Thin vertical rhythm marks, like a ruler. */
+.ticks {
+  background-image: repeating-linear-gradient(to right, #d4d4d8 0, #d4d4d8 1px, transparent 1px, transparent 6px);
+}
+
+/* Hero rings breathe slowly. */
+@keyframes breathe {
+  from {
+    transform: scale(0.96);
+    opacity: 0.65;
   }
-  @keyframes marquee-reverse {
-    0% { transform: translateX(-50%); }
-    100% { transform: translateX(0); }
+  to {
+    transform: scale(1.04);
+    opacity: 1;
   }
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
+}
+.breathe {
+  animation: breathe 2.4s ease-in-out infinite alternate;
+}
+.breathe-2 {
+  animation-delay: 0.3s;
+}
+.breathe-3 {
+  animation-delay: 0.6s;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin-slow {
+  animation: spin-slow 24s linear infinite;
+}
+
+/* Footer wordmark: letters rise in one by one when it scrolls into view. */
+.wordmark .letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.6em) scale(0.6);
+}
+.wordmark.in-view .letter {
+  animation: rise 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--i) * 45ms);
+}
+@keyframes rise {
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
-/* Base */
-@layer base {
+/* Live dot pulse. */
+@keyframes ping-soft {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+.ping-soft {
+  animation: ping-soft 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
   html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
   }
-  body {
-    @apply bg-white text-text antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+  .breathe,
+  .spin-slow,
+  .ping-soft {
+    animation: none;
   }
-}
-
-/* Utilities */
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  
-  /* Display Typography */
-  .text-display {
-    font-family: var(--font-display);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: -0.03em;
-    line-height: 0.9;
-  }
-  
-  .text-display-xl {
-    font-size: clamp(4rem, 15vw, 12rem);
-  }
-  
-  .text-display-lg {
-    font-size: clamp(3rem, 10vw, 8rem);
-  }
-  
-  .text-display-md {
-    font-size: clamp(2rem, 6vw, 4rem);
-  }
-
-  /* Marquee */
-  .animate-marquee {
-    animation: marquee 30s linear infinite;
-  }
-  
-  .animate-marquee-reverse {
-    animation: marquee-reverse 30s linear infinite;
-  }
-  
-  .animate-marquee-fast {
-    animation: marquee 15s linear infinite;
-  }
-
-  /* Clip Path Animations */
-  .clip-reveal {
-    clip-path: inset(0 0 0 0);
-  }
-  
-  .clip-hidden-right {
-    clip-path: inset(0 100% 0 0);
-  }
-  
-  .clip-hidden-left {
-    clip-path: inset(0 0 0 100%);
-  }
-
-  /* Line Reveal */
-  .line-reveal {
-    position: relative;
-  }
-  
-  .line-reveal::after {
-    content: "";
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--color-primary);
-    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  
-  .line-reveal:hover::after {
-    width: 100%;
-  }
-
-  /* Magnetic Button Base */
-  .magnetic-btn {
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  /* Text Gradient */
-  .text-gradient-red {
-    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Hide Scrollbar */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  /* Perspective for 3D effects */
-  .perspective-1000 {
-    perspective: 1000px;
-  }
-  
-  .preserve-3d {
-    transform-style: preserve-3d;
+  .wordmark .letter {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
   }
 }

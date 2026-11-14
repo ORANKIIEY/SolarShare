@@ -97,6 +97,16 @@ static const int ADC_SAMPLES = 8;              // average 8 ADC reads per sample
 static const uint32_t STATUS_PERIOD_MS = 5000; // print a status line every 5 s
 static const uint32_t READING_INTERVAL_MS = (uint32_t)READING_INTERVAL_S * 1000UL;
 static const size_t QUEUE_SIZE = 120;          // one hour of readings at 30 s
+
+// Quick readings: when the meter sees theft start or stop, it doesn't wait for
+// the next 30 s reading. It closes the current reading straight away and sends
+// a clean one shortly after, so the oracle (and the app) catch up in seconds.
+// A reading must cover at least MIN_WINDOW_WH of production: energy is counted
+// in whole Wh, and over a tiny window a 1 Wh rounding step looks like theft.
+static const uint32_t MIN_WINDOW_WH = 20;          // at 5 kW that is about 14 s
+static const uint32_t MIN_WINDOW_MS = 10000;       // never closer together than this
+static const uint32_t CHANGE_STABLE_MS = 1000;     // new state must hold 1 s (knob turning)
+static const uint32_t LIVE_PERIOD_MS = 2000;       // live preview to the app every 2 s
 static const uint64_t MS_PER_HOUR = 3600000ULL;
 
 // ---------------------------------------------------------------------------
@@ -401,6 +411,7 @@ static bool verifyReading(const SignedReading &sr) {
 // ---------------------------------------------------------------------------
 static char g_readingTopic[64];
 static char g_stateTopic[64];
+static char g_liveTopic[64];  // unsigned live preview (see MESSAGE_FORMAT.md)
 
 static size_t buildMessage(const SignedReading &sr, char *out, size_t outLen) {
   const MeterReading &r = sr.reading;
@@ -497,6 +508,14 @@ static bool g_tamper = false;
 static bool g_networkCut = false;
 static uint64_t g_lastReadingProducedWh = 0, g_lastReadingSoldWh = 0;
 
+// Reading schedule (see "Quick readings" at the top).
+static uint32_t g_lastReadingMs = 0;     // when the last reading was closed (millis)
+static uint32_t g_nextReadingMs = 0;     // when the next one is due (millis)
+static bool g_followUpPending = false;   // after a quick reading, send a clean one
+static bool g_alarmSeen = false;         // theft-or-tamper, as last confirmed
+static bool g_alarmCandidate = false;    // what the dials say right now
+static uint32_t g_candidateSinceMs = 0;  // since when they have said it
+
 // Average several ADC reads to smooth out noise (the same idea as the old
 // current_sensor driver this replaces). Returns 0..4095.
 static uint32_t readAdcAverage(int pin) {
@@ -532,6 +551,39 @@ static bool looksLikeTheftNow() {
 static unsigned gapPercent(uint64_t produced, uint64_t sold) {
   if (produced == 0 || sold >= produced) return 0;
   return (unsigned)(((produced - sold) * 100 + produced / 2) / produced);
+}
+
+// The shortest window a reading may cover: long enough for MIN_WINDOW_WH of
+// production at the current power, never under MIN_WINDOW_MS, never over the
+// normal interval.
+static uint32_t minWindowMs() {
+  if (g_producedW < 100) return READING_INTERVAL_MS;  // dark: nothing to hurry for
+  uint32_t ms = (uint32_t)((uint64_t)MIN_WINDOW_WH * MS_PER_HOUR / g_producedW);
+  if (ms < MIN_WINDOW_MS) ms = MIN_WINDOW_MS;
+  if (ms > READING_INTERVAL_MS) ms = READING_INTERVAL_MS;
+  return ms;
+}
+
+// When theft (or tamper) starts or stops and stays that way for a second,
+// close the current reading as soon as it is long enough, then send a clean
+// reading of the new state one short window later.
+static void watchForChange(uint32_t now) {
+  bool alarm = g_tamper || looksLikeTheftNow();
+  if (alarm != g_alarmCandidate) {
+    g_alarmCandidate = alarm;
+    g_candidateSinceMs = now;
+    return;
+  }
+  if (alarm == g_alarmSeen || now - g_candidateSinceMs < CHANGE_STABLE_MS) return;
+  g_alarmSeen = alarm;
+  uint32_t closeAt = g_lastReadingMs + minWindowMs();
+  bool closeNow = (int32_t)(closeAt - now) <= 0;
+  if (closeNow) closeAt = now;
+  if ((int32_t)(closeAt - g_nextReadingMs) < 0) g_nextReadingMs = closeAt;
+  g_followUpPending = true;
+  Serial.printf("[quick] meter sees %s: closing this reading %s, a clean one follows\n",
+                alarm ? (g_tamper ? "TAMPER" : "THEFT") : "normal sales again",
+                closeNow ? "now" : "as soon as it is long enough");
 }
 
 static void resyncClock();       // in the Network section below
@@ -848,6 +900,25 @@ static void saveState() {
   if (n && g_mqtt.publish(g_stateTopic, msg, true)) g_stateDirty = false;
 }
 
+// Live preview for the web app: what the dials say right now, every 2 s.
+// NOT signed and NOT used for payouts: only signed readings reach the oracle.
+// It lets the app react to the knob within seconds while the signed proof follows.
+static uint32_t g_lastLiveMs = 0;
+static void publishLive() {
+  if (g_networkCut || !g_mqtt.connected()) return;
+  int32_t dueMs = (int32_t)(g_nextReadingMs - millis());
+  if (dueMs < 0) dueMs = 0;
+  char msg[256];
+  int n = snprintf(msg, sizeof(msg),
+                   "{\"meterId\":%lu,\"t\":%llu,\"producedW\":%lu,\"stolenW\":%lu,\"soldW\":%lu,"
+                   "\"gapPct\":%u,\"theft\":%s,\"tamper\":%s,\"nextReadingS\":%ld,\"queued\":%u}",
+                   (unsigned long)METER_ID, (unsigned long long)time(nullptr),
+                   (unsigned long)g_producedW, (unsigned long)g_stolenW, (unsigned long)g_soldW,
+                   gapPercent(g_producedW, g_soldW), looksLikeTheftNow() ? "true" : "false",
+                   g_tamper ? "true" : "false", (long)((dueMs + 999) / 1000), (unsigned)g_queueCount);
+  if (n > 0 && n < (int)sizeof(msg)) g_mqtt.publish(g_liveTopic, msg, false);
+}
+
 static void serviceNetwork() {
   if (g_networkCut) {
     if (g_mqtt.connected()) {
@@ -909,7 +980,7 @@ static void printStatus() {
 // ---------------------------------------------------------------------------
 // Arduino entry points
 // ---------------------------------------------------------------------------
-static uint32_t g_lastSampleMs = 0, g_lastReadingMs = 0, g_lastStatusMs = 0;
+static uint32_t g_lastSampleMs = 0, g_lastStatusMs = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -939,6 +1010,7 @@ void setup() {
   ethAddressChecksummed(g_publicKey, g_deviceAddress);
   snprintf(g_readingTopic, sizeof(g_readingTopic), "solarshare/meter/%lu/reading", (unsigned long)METER_ID);
   snprintf(g_stateTopic, sizeof(g_stateTopic), "solarshare/meter/%lu/state", (unsigned long)METER_ID);
+  snprintf(g_liveTopic, sizeof(g_liveTopic), "solarshare/meter/%lu/live", (unsigned long)METER_ID);
   snprintf(g_clientId, sizeof(g_clientId), "solarshare-meter-%lu-%08lx", (unsigned long)METER_ID,
            (unsigned long)esp_random());
 
@@ -946,6 +1018,8 @@ void setup() {
   Serial.printf("[meter] signing for chain %lu, contract %s\n", (unsigned long)DOMAIN_CHAIN_ID,
                 VERIFYING_CONTRACT);
   Serial.printf("[meter] one reading every %d s, topic %s\n", READING_INTERVAL_S, g_readingTopic);
+  Serial.printf("[meter] quick reading when theft starts or stops; live preview every %lu s on %s\n",
+                (unsigned long)(LIVE_PERIOD_MS / 1000), g_liveTopic);
 
   g_mqtt.setBufferSize(1024);
   g_mqtt.setCallback(onMqttMessage);
@@ -955,8 +1029,10 @@ void setup() {
   syncTime();
   resumeFromBrokers();
 
-  g_lastSampleMs = g_lastReadingMs = g_lastStatusMs = millis();
+  g_lastSampleMs = g_lastReadingMs = g_lastStatusMs = g_lastLiveMs = millis();
+  g_nextReadingMs = g_lastReadingMs + READING_INTERVAL_MS;
   sampleAndIntegrate(0);
+  g_alarmSeen = g_alarmCandidate = g_tamper || looksLikeTheftNow();
   printStatus();
 }
 
@@ -965,10 +1041,22 @@ void loop() {
   if (now - g_lastSampleMs >= SAMPLE_PERIOD_MS) {
     sampleAndIntegrate(now - g_lastSampleMs);
     g_lastSampleMs = now;
+    watchForChange(now);
   }
-  if (now - g_lastReadingMs >= READING_INTERVAL_MS) {
-    g_lastReadingMs += READING_INTERVAL_MS;
+  if ((int32_t)(now - g_nextReadingMs) >= 0) {
     makeReading();
+    g_lastReadingMs = now;
+    if (g_followUpPending) {
+      g_followUpPending = false;
+      g_nextReadingMs = now + minWindowMs();
+      Serial.printf("[quick] clean reading in %lu s\n", (unsigned long)((minWindowMs() + 999) / 1000));
+    } else {
+      g_nextReadingMs = now + READING_INTERVAL_MS;
+    }
+  }
+  if (now - g_lastLiveMs >= LIVE_PERIOD_MS) {
+    g_lastLiveMs = now;
+    publishLive();
   }
   if (now - g_lastStatusMs >= STATUS_PERIOD_MS) {
     g_lastStatusMs = now;

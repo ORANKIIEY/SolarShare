@@ -1,0 +1,9 @@
+{
+  "_note": "Every outside address the browser may talk to. next.config.ts builds the Content-Security-Policy from this file. sepolia.base.org only searches 200 blocks of events at a time, so meter history uses logRpcs.",
+  "readRpcs": ["https://sepolia.base.org", "https://base-sepolia-rpc.publicnode.com"],
+  "logRpcs": [
+    { "url": "https://base-sepolia.gateway.tenderly.co", "maxRange": 500000 },
+    { "url": "https://base-sepolia-rpc.publicnode.com", "maxRange": 50000 }
+  ],
+  "documentHost": "https://raw.githubusercontent.com"
+}

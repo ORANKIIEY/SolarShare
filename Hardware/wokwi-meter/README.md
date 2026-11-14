@@ -128,6 +128,21 @@ Click a part in the circuit to use it while the simulation runs.
   reading on the MQTT broker and reads it back at boot. See
   [MESSAGE_FORMAT.md](MESSAGE_FORMAT.md#saved-state-retained-message).
 
+### Fast reactions for the demo
+
+Turn the theft knob and the meter reacts straight away, in two ways:
+
+- **Live preview, every 2 s** (`.../live`, unsigned): the web app turns its
+  banner **amber** ("meter sees possible theft, checking the signed reading")
+  within about 2 seconds. This is only a preview; it never pauses payouts.
+- **Quick signed readings:** the meter prints
+  `[quick] meter sees THEFT: closing this reading now, a clean one follows`,
+  then `[quick] clean reading in 14 s`. That clean reading reaches the contract
+  and turns the banner **red** (payouts paused) about 15–30 s after the turn.
+  Turning the knob back works the same way and turns it **green**.
+
+Details in [MESSAGE_FORMAT.md](MESSAGE_FORMAT.md#live-preview-unsigned).
+
 ### The clock after a pause
 
 The meter gets the real time from the internet (NTP) at boot and then counts

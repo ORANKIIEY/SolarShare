@@ -1,45 +1,25 @@
-# ─────────────────────────────────────────────────────────────────────────────
-# GridGuard AI Frontend — Production Docker Image
-# Work Breakdown: Vercel/Netlify → CAE static hosting
-#
-# Build: docker build -t swr.ap-southeast-3.myhuaweicloud.com/<org>/gridguard-frontend:latest .
-# Push:  docker push swr.ap-southeast-3.myhuaweicloud.com/<org>/gridguard-frontend:latest
-# Deploy: See Infrastructure/cae-frontend.yaml
-#
-# Security (Work Breakdown: Zero Trust Architecture):
-#   - Runs as non-root user (node, uid=1000)
-#   - Read-only filesystem where possible
-#   - Huawei WAF sits in front of CAE ELB — no direct internet access to pod
-# ─────────────────────────────────────────────────────────────────────────────
+# SolarShare web app: production image.
+#   docker build -t solarshare-web .
+#   docker run -p 3000:3000 solarshare-web
 
-FROM node:20-alpine AS deps
+FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --only=production
+RUN npm ci
 
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
-COPY . .
 COPY --from=deps /app/node_modules ./node_modules
-# Build-time env vars (non-secret, public keys only)
-ARG NEXT_PUBLIC_API_URL
-ARG NEXT_PUBLIC_HUAWEI_CLIENT_ID
-ARG NEXT_PUBLIC_HUAWEI_AUTH_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_HUAWEI_CLIENT_ID=$NEXT_PUBLIC_HUAWEI_CLIENT_ID
-ENV NEXT_PUBLIC_HUAWEI_AUTH_URL=$NEXT_PUBLIC_HUAWEI_AUTH_URL
+COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
-ENV NODE_ENV=production
-# Non-root user — Work Breakdown: Zero Trust / HSS host security
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser  --system --uid 1001 nextjs
-COPY --from=builder /app/public ./public
+ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000
+RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 EXPOSE 3000
-ENV PORT=3000
 CMD ["node", "server.js"]
